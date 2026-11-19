@@ -1,0 +1,1578 @@
+\documentclass[a4paper,12pt]{report}
+
+% --- Encoding & Font (XeLaTeX native Unicode for Vietnamese names) ---
+\usepackage{fontspec}
+\defaultfontfeatures{Scale=MatchLowercase}
+\setmainfont{Times New Roman}[Ligatures=TeX,Scale=1]
+\setmonofont{Latin Modern Mono}[Scale=0.88]
+
+% --- Page Layout ---
+\usepackage[top=2.5cm, bottom=2.5cm, left=3cm, right=2.5cm]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+
+% --- Graphics ---
+\usepackage{graphicx}
+\graphicspath{{../}{./}}
+\usepackage{float}
+\usepackage{pdflscape}
+\makeatletter
+\newsavebox\pandoc@box
+\newcommand*\pandocbounded[1]{% scales image to fit in text height/width
+  \sbox\pandoc@box{#1}%
+  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
+  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi
+  \ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
+  \else\usebox\pandoc@box%
+  \fi%
+}
+\def\fps@figure{htbp}
+\makeatother
+
+% --- Tables ---
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{calc}
+\usepackage{etoolbox}
+\newcounter{none} % for unnumbered Pandoc tables
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+\AtBeginEnvironment{longtable}{\footnotesize\setlength{\tabcolsep}{3.5pt}}
+
+% --- Math ---
+\usepackage{amsmath,amssymb}
+
+% --- Colors ---
+\usepackage{xcolor}
+\definecolor{ptitblue}{RGB}{0,51,153}
+
+% --- Hyperlinks ---
+\usepackage[hidelinks,unicode]{hyperref}
+\usepackage{url}
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{}
+\urlstyle{same}
+
+% --- Section Formatting (aligned with ref/report.tex) ---
+\usepackage{titlesec}
+
+\titleformat{\chapter}[display]
+  {\normalfont\fontsize{22}{26}\bfseries}
+  {Chapter \thechapter}{14pt}{\fontsize{22}{26}\bfseries}
+\titlespacing*{\chapter}{0pt}{-10pt}{24pt}
+
+\titleformat{\section}
+  {\normalfont\fontsize{16}{20}\bfseries\raggedright}{\thesection}{1em}{}
+\titlespacing*{\section}{0pt}{18pt}{10pt}
+
+\titleformat{\subsection}
+  {\normalfont\fontsize{13}{17}\bfseries\raggedright}{\thesubsection}{1em}{}
+\titlespacing*{\subsection}{0pt}{14pt}{8pt}
+
+\titleformat{\subsubsection}
+  {\normalfont\fontsize{12}{15}\bfseries\itshape\raggedright}{\thesubsubsection}{1em}{}
+\titlespacing*{\subsubsection}{0pt}{10pt}{6pt}
+
+% --- Caption ---
+\usepackage{caption}
+\captionsetup{font=small, labelfont=bf, skip=8pt}
+
+% Full-page landscape placement for oversized vector diagrams (ERD, Relational Schema)
+\newcommand{\landscapefigure}[2]{%
+  \begin{landscape}
+  \thispagestyle{plain}%
+  \begin{figure}[p]
+  \centering
+  \includegraphics[width=\linewidth,height=0.88\textheight,keepaspectratio]{#1}
+  \caption{#2}
+  \end{figure}
+  \end{landscape}
+}
+
+% --- Header / Footer ---
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0pt}
+
+% --- TOC & Section Numbering Depth ---
+\setcounter{tocdepth}{3}
+\setcounter{secnumdepth}{3}
+
+% --- Paragraph Indentation & Pandoc Helpers ---
+\usepackage{indentfirst}
+\setlength{\parindent}{1cm}
+\tolerance=1600
+\setlength{\emergencystretch}{5em}
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+
+% --- TikZ for cover page decorations ---
+\usepackage{tikz}
+\usetikzlibrary{calc}
+
+\begin{document}
+
+% =============================================================
+% TITLE PAGE
+% =============================================================
+\hypersetup{pageanchor=false}
+\begin{titlepage}
+\thispagestyle{empty}
+
+% --- Decorative double-line border ---
+\begin{tikzpicture}[remember picture, overlay]
+  \draw[line width=1.6pt]
+    ([shift={(1.2cm,-1.2cm)}]current page.north west)
+    rectangle
+    ([shift={(-1.2cm,1.2cm)}]current page.south east);
+  \draw[line width=0.5pt]
+    ([shift={(1.45cm,-1.45cm)}]current page.north west)
+    rectangle
+    ([shift={(-1.45cm,1.45cm)}]current page.south east);
+\end{tikzpicture}
+
+\begin{center}
+
+% --- University & Department header ---
+\textbf{\fontsize{13}{16}\selectfont POSTS AND TELECOMMUNICATIONS INSTITUTE OF TECHNOLOGY}\\[0.25cm]
+\textbf{\fontsize{13}{16}\selectfont FACULTY OF INFORMATION TECHNOLOGY}\\[0.15cm]
+
+% --- Horizontal rule ---
+{\centering\rule[0.5ex]{10cm}{0.4pt}\par}
+
+\vspace{0.8cm}
+
+% --- PTIT Logo ---
+\includegraphics[width=3.5cm]{logo.png}
+
+\vspace{0.8cm}
+
+% --- Project title ---
+{\fontsize{20}{26}\selectfont\bfseries\color{ptitblue}
+DATABASE DESIGN TERM PROJECT}\\[0.4cm]
+{\fontsize{14}{19}\selectfont\bfseries\color{ptitblue}
+Database system for a construction company with multiple projects}\\[0.9cm]
+
+% --- Course & Team info ---
+{\large\textbf{Course:} Database {[}E24-Class 5{]} \quad--\quad \textbf{Team:} 5}\\[0.6cm]
+
+% --- Member table ---
+{\fontsize{11}{14}\selectfont
+\textit{Team Members}\\[0.3cm]
+
+\begin{tabular}{l c}
+\textbf{Full Name} & \textbf{Student ID} \\ \hline
+\rule{0pt}{0.1cm} \\[-0.4cm]
+Lê Anh Minh & B24DCCE180 \\[0.1cm]
+Ứng Trọng Trình & B24DCCE271 \\[0.1cm]
+Nguyễn Đinh Anh Quân & B24DCCE222 \\[0.1cm]
+\end{tabular}
+}
+
+\vspace{0.8cm}
+
+% --- Instructor ---
+{\large\textbf{Instructor:} Nguyễn Đình Hoá}
+
+\vfill
+
+% --- Footer ---
+{\large Hanoi, 2026}
+
+\end{center}
+\end{titlepage}
+\hypersetup{pageanchor=true}
+
+% =============================================================
+% TABLE OF CONTENTS & LIST OF FIGURES
+% =============================================================
+\newpage
+\tableofcontents
+
+\newpage
+\listoffigures
+\addcontentsline{toc}{chapter}{List of Figures}
+
+% =============================================================
+% BODY
+% =============================================================
+\chapter{Company background and scenario}\label{company-background-and-scenario}
+
+\section{Overview}\label{overview}
+
+A34Build is a general contractor handling civil infrastructure, commercial buildings, and industrial facilities. The company runs multiple active projects simultaneously across distributed job sites, each governed by contractual deadlines, fixed budgets, and statutory safety requirements. Daily operations coordinate field engineers, site managers, equipment operators, heavy machinery, specialized subcontractors, and bulk construction materials.
+
+Because operations currently rely on spreadsheets and paper logs, project teams experience scheduling delays, budget overruns, on-site inventory loss, and delayed cost tracking. The target relational database centralizes project schedules, workforce assignments, equipment utilization, material procurement, subcontracting, and site safety compliance.
+
+\section{Main business operations}\label{main-business-operations}
+
+Database coverage spans seven operational areas:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Projects: Client contracts, job sites, project phases, and scheduled work packages.
+\item
+  Workforce: Job roles, reporting hierarchy, certifications, dependents, and task assignments.
+\item
+  Equipment: Owned and rented machinery, site deployments, operating hours, and maintenance logs.
+\item
+  Materials: Suppliers, purchase orders, site deliveries, stock levels, and task consumption.
+\item
+  Subcontractors: Trade specialties, subcontract agreements, warranty holdbacks, and safety ratings.
+\item
+  Project costs: Budget variance tracking across labor, equipment, materials, and subcontracts.
+\item
+  Safety: Site safety audits, inspection scores, and workplace incident reports.
+\end{enumerate}
+
+\chapter{Data requirements}\label{data-requirements}
+
+\section{Entity sets}\label{entity-sets}
+
+\subsection{Strong entity sets}\label{strong-entity-sets}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  DEPARTMENT: Company organizational units (\allowbreak{}Civil Engineering, Heavy Fleet, Procurement, Safety, Finance).
+\item
+  EMPLOYEE: Full-time and field staff (\allowbreak{}engineers, managers, operators, inspectors).
+\item
+  CLIENT: Public agencies and private developers commissioning projects.
+\item
+  PROJECT: Construction contracts with defined budgets and delivery schedules.
+\item
+  PROJECT\_\allowbreak{}SITE: Physical work locations belonging to a project.
+\item
+  TASK: Work packages within a project phase assigned to workers.
+\item
+  EQUIPMENT: Heavy machinery and construction vehicles.
+\item
+  SUPPLIER: Vendors supplying raw materials and parts.
+\item
+  MATERIAL: Standard catalog items (\allowbreak{}cement, rebar, gravel, pipes).
+\item
+  PURCHASE\_\allowbreak{}ORDER: Procurement orders issued to suppliers.
+\item
+  SUBCONTRACTOR: External contractors hired for specialized trades.
+\item
+  SAFETY\_\allowbreak{}INSPECTION: Periodic site safety audits.
+\item
+  INCIDENT\_\allowbreak{}REPORT: Logs of workplace accidents, equipment damage, or near-misses.
+\end{enumerate}
+
+\subsection{Weak entity sets}\label{weak-entity-sets}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  DEPENDENT: Family members of an employee recorded for benefits and emergency contact (\allowbreak{}identifying entity: \texttt{EMPLOYEE}; identifying relationship: \texttt{HAS\_\allowbreak{}DEPENDENT}; partial key: \texttt{DependentName}).
+\item
+  PROJECT\_\allowbreak{}PHASE: Sequential stages within a project such as Foundation, Structure, and Finishing (\allowbreak{}identifying entity: \texttt{PROJECT}; identifying relationship: \texttt{CONSISTS\_\allowbreak{}OF\_\allowbreak{}PHASES}; partial key: \texttt{PhaseNumber}).
+\item
+  PO\_\allowbreak{}ITEM: Individual line items on a purchase order (\allowbreak{}identifying entity: \texttt{PURCHASE\_\allowbreak{}ORDER}; identifying relationship: \texttt{CONTAINS\_\allowbreak{}ITEM}; partial key: \texttt{LineNumber}).
+\item
+  MAINTENANCE\_\allowbreak{}RECORD: Service and repair logs for a machine (\allowbreak{}identifying entity: \texttt{EQUIPMENT}; identifying relationship: \texttt{HAS\_\allowbreak{}MAINTENANCE}; partial key: \texttt{RecordNumber}).
+\end{enumerate}
+
+\section{Attributes}\label{attributes}
+
+\subsection{Strong entity sets}\label{strong-entity-sets-1}
+
+\subsubsection{DEPARTMENT}\label{department}
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.2400}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.1600}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.6000}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Attribute
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Type
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Description
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+DeptID & Primary Key & Unique department code (\allowbreak{}e.\allowbreak{}g., D01) \\
+DeptName & Simple & Department name \\
+OfficeLocation & Simple & Office room or floor \\
+Budget & Simple & Annual operating budget \\
+\end{longtable}
+}
+
+\subsubsection{EMPLOYEE}\label{employee}
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.2400}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.1600}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.6000}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Attribute
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Type
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Description
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+EmpID & Primary Key & Unique employee identifier \\
+Name & Composite & Composed of FirstName, MiddleName, LastName \\
+Address & Composite & Composed of Street, Ward, District, City \\
+DOB & Simple & Date of birth \\
+Age & Derived & Current date minus date of birth \\
+HireDate & Simple & Employment start date \\
+Salary & Simple & Monthly base salary \\
+JobTitle & Simple & Job title (\allowbreak{}Site Engineer, Crane Operator) \\
+Email & Candidate Key & Unique company email \\
+PhoneNumber & Multi-valued & Contact phone numbers \\
+Certifications & Multi-valued & Licenses and certificates (\allowbreak{}OSHA, Crane Class A) \\
+\end{longtable}
+}
+
+\subsubsection{CLIENT}\label{client}
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.2400}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.1600}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.6000}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Attribute
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Type
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Description
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+ClientID & Primary Key & Unique client identifier \\
+ClientName & Simple & Organization or company name \\
+ClientType & Simple & Sector (\allowbreak{}Government, Commercial, Residential, Industrial) \\
+ContactPerson & Simple & Primary contact person \\
+ContactEmail & Simple & Email address \\
+ContactPhone & Multi-valued & Contact phone numbers \\
+TaxCode & Candidate Key & Business tax code \\
+\end{longtable}
+}
+
+\subsubsection{PROJECT}\label{project}
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.2400}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.1600}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.6000}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Attribute
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Type
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Description
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+ProjectID & Primary Key & Project code (\allowbreak{}e.\allowbreak{}g., PRJ-2026-001) \\
+ProjectName & Simple & Project name \\
+StartDate & Simple & Planned start date \\
+PlannedEndDate & Simple & Contractual deadline \\
+ActualEndDate & Simple & Real completion date (\allowbreak{}null if ongoing) \\
+ProjectDuration & Derived & Elapsed days from StartDate to ActualEndDate or today \\
+EstimatedBudget & Simple & Contract budget limit \\
+ActualCost & Derived & Total cost of labor, equipment, materials, and subcontracts \\
+Status & Simple & Planned, In-Progress, Suspended, Completed \\
+\end{longtable}
+}
+
+\subsubsection{\texorpdfstring{PROJECT\texorpdfstring{\_\allowbreak{}}{_}SITE}{PROJECTSITE}}\label{project_site}
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.2400}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.1600}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.6000}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Attribute
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Type
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Description
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+SiteID & Primary Key & Unique site identifier \\
+SiteName & Simple & Site name or sector \\
+LocationCoordinates & Composite & Composed of Latitude, Longitude \\
+Address & Composite & Composed of StreetAddress, District, City\_\allowbreak{}Province \\
+EnvironmentalPermit & Simple & Environmental permit number \\
+SiteStatus & Simple & Operating state (\allowbreak{}Preparation, Active, Handed\_\allowbreak{}Over) \\
+\end{longtable}
+}
+
+\subsubsection{TASK}\label{task}
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.2400}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.1600}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.6000}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Attribute
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Type
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Description
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+TaskID & Primary Key & Unique task identifier \\
+TaskName & Simple & Task name (\allowbreak{}Pour pile B12) \\
+EstimatedHours & Simple & Estimated work hours \\
+ActualHours & Derived & Sum of worker hours logged on this task \\
+ScheduledStartDate & Simple & Scheduled start date \\
+ScheduledEndDate & Simple & Scheduled end date \\
+ActualEndDate & Simple & Actual completion date (\allowbreak{}null if ongoing) \\
+PriorityLevel & Simple & Low, Medium, High, Urgent \\
+TaskStatus & Simple & Execution state (\allowbreak{}Pending, In\_\allowbreak{}Progress, Completed, Blocked) \\
+\end{longtable}
+}
+
+\subsubsection{EQUIPMENT}\label{equipment}
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.2400}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.1600}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.6000}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Attribute
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Type
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Description
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+EquipmentID & Primary Key & Unique asset code \\
+Model & Simple & Make and model (\allowbreak{}CAT 320D) \\
+SerialNumber & Candidate Key & Manufacturer serial number \\
+Category & Simple & Excavator, Crane, Truck, Paver, Mixer \\
+Ownership & Simple & Owned or Rented \\
+HourlyRate & Simple & Cost per operating hour \\
+CurrentStatus & Simple & Available, Deployed, Under-Maintenance, Retired \\
+TotalRunHours & Derived & Total operating hours across all jobs \\
+\end{longtable}
+}
+
+\subsubsection{SUPPLIER}\label{supplier}
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.2400}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.1600}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.6000}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Attribute
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Type
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Description
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+SupplierID & Primary Key & Unique vendor identifier \\
+CompanyName & Simple & Registered company name \\
+TaxCode & Candidate Key & Official business tax ID \\
+ContactEmail & Simple & Sales email \\
+ContactPhone & Multi-valued & Contact phone numbers \\
+SupplyCategories & Multi-valued & Product lines (\allowbreak{}Steel, Cement, Lumber) \\
+CreditRating & Simple & Rating grade (\allowbreak{}A, B, C) \\
+\end{longtable}
+}
+
+\subsubsection{MATERIAL}\label{material}
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.2400}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.1600}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.6000}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Attribute
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Type
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Description
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+MaterialID & Primary Key & Unique material SKU \\
+MaterialName & Simple & Material name (\allowbreak{}Portland Cement PCB40) \\
+Category & Simple & Material classification (\allowbreak{}Steel, Cement, Aggregate, Piping, Electrical) \\
+StandardUnit & Simple & Unit of measurement (\allowbreak{}Ton, m3, Bag, Piece) \\
+UnitPrice & Simple & Reference price per unit \\
+MinStock & Simple & Minimum safety stock count \\
+\end{longtable}
+}
+
+\subsubsection{\texorpdfstring{PURCHASE\texorpdfstring{\_\allowbreak{}}{_}ORDER}{PURCHASEORDER}}\label{purchase_order}
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.2400}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.1600}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.6000}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Attribute
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Type
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Description
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+PO\_\allowbreak{}ID & Primary Key & Unique PO number \\
+OrderDate & Simple & Date order was placed \\
+ExpectedDeliveryDate & Simple & Promised arrival date \\
+DeliveryStatus & Simple & Issued, Partial\_\allowbreak{}Delivery, Fulfilled, Cancelled \\
+TotalPOAmount & Derived & Sum of line subtotals \\
+\end{longtable}
+}
+
+\subsubsection{SUBCONTRACTOR}\label{subcontractor}
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.2400}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.1600}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.6000}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Attribute
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Type
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Description
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+SubcontractorID & Primary Key & Unique subcontractor identifier \\
+CompanyName & Simple & Registered company name \\
+TaxCode & Candidate Key & Official business tax ID \\
+ContactEmail & Simple & Official contact email \\
+ContactPhone & Simple & Primary dispatch phone number \\
+TradeSpecialty & Simple & Specialized trade (\allowbreak{}Piling, Electrical, HVAC, Facade) \\
+LicenseNumber & Candidate Key & Trade license number \\
+SafetyRatingScore & Simple & Safety score (\allowbreak{}0.0 to 10.0) \\
+\end{longtable}
+}
+
+\subsubsection{\texorpdfstring{SAFETY\texorpdfstring{\_\allowbreak{}}{_}INSPECTION}{SAFETYINSPECTION}}\label{safety_inspection}
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.2400}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.1600}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.6000}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Attribute
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Type
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Description
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+InspectionID & Primary Key & Unique inspection log ID \\
+InspectionDate & Simple & Date of inspection \\
+InspectionType & Simple & Audit type (\allowbreak{}Routine, Unannounced, Pre-Operation) \\
+InspectionScope & Simple & Inspected area or structure (\allowbreak{}e.\allowbreak{}g., Tower crane, Scaffold level 4) \\
+OverallScore & Simple & Evaluation score (\allowbreak{}0 to 100) \\
+InspectionResult & Simple & Audit conclusion (\allowbreak{}Passed, Conditional\_\allowbreak{}Pass, Failed) \\
+ViolationNoted & Simple & Safety issues found \\
+FixDeadline & Simple & Deadline to fix issues (\allowbreak{}null if passed) \\
+\end{longtable}
+}
+
+\subsubsection{\texorpdfstring{INCIDENT\texorpdfstring{\_\allowbreak{}}{_}REPORT}{INCIDENTREPORT}}\label{incident_report}
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.2400}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.1600}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.6000}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Attribute
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Type
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Description
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+IncidentID & Primary Key & Unique incident case ID \\
+IncidentTimestamp & Simple & Date and time of incident \\
+IncidentType & Simple & Event category (\allowbreak{}Fall, Electrical, Equipment\_\allowbreak{}Collision, Falling\_\allowbreak{}Object) \\
+IncidentLevel & Simple & Impact classification (\allowbreak{}Warning, Minor, Serious, Fatal) \\
+DamageDescription & Simple & Injury or equipment damage details \\
+LostDays & Simple & Work days lost due to injury \\
+Solution & Simple & Immediate remedial or preventive action taken \\
+\end{longtable}
+}
+
+\subsection{Weak entity sets}\label{weak-entity-sets-1}
+
+\subsubsection{DEPENDENT}\label{dependent}
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.2400}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.1600}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.6000}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Attribute
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Type
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Description
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+DependentName & Partial Key & Full name of dependent \\
+Gender & Simple & Gender (\allowbreak{}M, F, Other) \\
+BirthDate & Simple & Date of birth \\
+Relationship & Simple & Relationship to employee (\allowbreak{}Spouse, Child, Parent) \\
+ContactPhone & Simple & Emergency contact phone number \\
+IsEmergencyContact & Simple & Primary emergency contact flag (\allowbreak{}true or false) \\
+\end{longtable}
+}
+
+\subsubsection{\texorpdfstring{PROJECT\texorpdfstring{\_\allowbreak{}}{_}PHASE}{PROJECTPHASE}}\label{project_phase}
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.2400}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.1600}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.6000}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Attribute
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Type
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Description
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+PhaseNumber & Partial Key & Phase sequence number (\allowbreak{}1, 2, 3\ldots) \\
+PhaseTitle & Simple & Phase title (\allowbreak{}Excavation, Structure) \\
+StartDate & Simple & Scheduled start date for this phase \\
+TargetCompletionDate & Simple & Target completion date for phase \\
+PhaseBudget & Simple & Budget allocated to this phase \\
+PhaseStatus & Simple & Pending, Active, Under-Inspection, Accepted \\
+\end{longtable}
+}
+
+\subsubsection{\texorpdfstring{PO\texorpdfstring{\_\allowbreak{}}{_}ITEM}{POITEM}}\label{po_item}
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.2400}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.1600}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.6000}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Attribute
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Type
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Description
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+LineNumber & Partial Key & Line item number (\allowbreak{}1, 2, 3\ldots) \\
+QuantityOrdered & Simple & Quantity purchased \\
+AgreedUnitPrice & Simple & Negotiated unit price \\
+ItemSubtotal & Derived & QuantityOrdered multiplied by AgreedUnitPrice \\
+\end{longtable}
+}
+
+\subsubsection{\texorpdfstring{MAINTENANCE\texorpdfstring{\_\allowbreak{}}{_}RECORD}{MAINTENANCERECORD}}\label{maintenance_record}
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.2400}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.1600}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.6000}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Attribute
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Type
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Description
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+RecordNumber & Partial Key & Service record counter \\
+ServiceDate & Simple & Date of service \\
+MaintenanceType & Simple & Service type (\allowbreak{}Oil Change, Inspection, Hydraulic Repair, Overhaul) \\
+Cost & Simple & Repair and parts cost \\
+ServiceVendor & Simple & Workshop name or external vendor \\
+\end{longtable}
+}
+
+\chapter{Relationships and constraints}\label{relationships-and-constraints}
+
+\section{Relationships}\label{relationships}
+
+\subsection{\texorpdfstring{DEPARTMENT\texorpdfstring{\_\allowbreak{}}{_}HEAD (EMPLOYEE to DEPARTMENT)}{DEPARTMENTHEAD (EMPLOYEE to DEPARTMENT)}}\label{department_head-employee-to-department}
+
+\begin{itemize}
+\tightlist
+\item
+  Binary 1:1
+\item
+  Participation: \texttt{DEPARTMENT} is total (\allowbreak{}every department has one manager); \texttt{EMPLOYEE} is partial (\allowbreak{}only some employees are department heads).
+\item
+  Rule: An employee manages at most one department.
+\end{itemize}
+
+\subsection{\texorpdfstring{WORKS\texorpdfstring{\_\allowbreak{}}{_}IN\texorpdfstring{\_\allowbreak{}}{_}DEPARTMENT (DEPARTMENT to EMPLOYEE)}{WORKSINDEPARTMENT (DEPARTMENT to EMPLOYEE)}}\label{works_in_department-department-to-employee}
+
+\begin{itemize}
+\tightlist
+\item
+  Binary 1:N
+\item
+  Participation: \texttt{EMPLOYEE} is total (\allowbreak{}every employee belongs to one department); \texttt{DEPARTMENT} is total (\allowbreak{}every department employs at least one person).
+\item
+  Rule: An employee belongs to exactly one department.
+\end{itemize}
+
+\subsection{SUPERVISES (EMPLOYEE to EMPLOYEE)}\label{supervises-employee-to-employee}
+
+\begin{itemize}
+\tightlist
+\item
+  Unary (\allowbreak{}recursive) 1:N
+\item
+  Participation: Both roles are partial (\allowbreak{}not every employee supervises subordinates, and the top executive has no supervisor).
+\item
+  Rule: An employee reports to at most one direct supervisor.
+\end{itemize}
+
+\subsection{\texorpdfstring{HAS\texorpdfstring{\_\allowbreak{}}{_}DEPENDENT (EMPLOYEE to DEPENDENT)}{HASDEPENDENT (EMPLOYEE to DEPENDENT)}}\label{has_dependent-employee-to-dependent}
+
+\begin{itemize}
+\tightlist
+\item
+  Identifying 1:N
+\item
+  Participation: \texttt{EMPLOYEE} is partial; \texttt{DEPENDENT} is total (\allowbreak{}each dependent belongs to one employee).
+\end{itemize}
+
+\subsection{COMMISSIONS (CLIENT to PROJECT)}\label{commissions-client-to-project}
+
+\begin{itemize}
+\tightlist
+\item
+  Binary 1:N
+\item
+  Participation: \texttt{CLIENT} is partial; \texttt{PROJECT} is total (\allowbreak{}every project is commissioned by a client).
+\end{itemize}
+
+\subsection{\texorpdfstring{DEPARTMENT\texorpdfstring{\_\allowbreak{}}{_}SPONSORS\texorpdfstring{\_\allowbreak{}}{_}PROJECT (DEPARTMENT to PROJECT)}{DEPARTMENTSPONSORSPROJECT (DEPARTMENT to PROJECT)}}\label{department_sponsors_project-department-to-project}
+
+\begin{itemize}
+\tightlist
+\item
+  Binary 1:N
+\item
+  Participation: \texttt{DEPARTMENT} is partial; \texttt{PROJECT} is total (\allowbreak{}each project is assigned to one managing department).
+\end{itemize}
+
+\subsection{\texorpdfstring{DIRECTS\texorpdfstring{\_\allowbreak{}}{_}PROJECT (EMPLOYEE to PROJECT)}{DIRECTSPROJECT (EMPLOYEE to PROJECT)}}\label{directs_project-employee-to-project}
+
+\begin{itemize}
+\tightlist
+\item
+  Binary 1:1
+\item
+  Participation: \texttt{PROJECT} is total (\allowbreak{}every project has one site director); \texttt{EMPLOYEE} is partial.
+\item
+  Rule: An employee directs at most one active project at a time.
+\end{itemize}
+
+\subsection{\texorpdfstring{HAS\texorpdfstring{\_\allowbreak{}}{_}SITES (PROJECT to PROJECT\texorpdfstring{\_\allowbreak{}}{_}SITE)}{HASSITES (PROJECT to PROJECTSITE)}}\label{has_sites-project-to-project_site}
+
+\begin{itemize}
+\tightlist
+\item
+  Binary 1:N
+\item
+  Participation: \texttt{PROJECT} is total (\allowbreak{}every project has at least one job site); \texttt{PROJECT\_\allowbreak{}SITE} is total.
+\end{itemize}
+
+\subsection{\texorpdfstring{CONSISTS\texorpdfstring{\_\allowbreak{}}{_}OF\texorpdfstring{\_\allowbreak{}}{_}PHASES (PROJECT to PROJECT\texorpdfstring{\_\allowbreak{}}{_}PHASE)}{CONSISTSOFPHASES (PROJECT to PROJECTPHASE)}}\label{consists_of_phases-project-to-project_phase}
+
+\begin{itemize}
+\tightlist
+\item
+  Identifying 1:N
+\item
+  Participation: \texttt{PROJECT} is total; \texttt{PROJECT\_\allowbreak{}PHASE} is total.
+\end{itemize}
+
+\subsection{\texorpdfstring{CONTAINS\texorpdfstring{\_\allowbreak{}}{_}TASKS (PROJECT\texorpdfstring{\_\allowbreak{}}{_}PHASE to TASK)}{CONTAINSTASKS (PROJECTPHASE to TASK)}}\label{contains_tasks-project_phase-to-task}
+
+\begin{itemize}
+\tightlist
+\item
+  Binary 1:N
+\item
+  Participation: \texttt{PROJECT\_\allowbreak{}PHASE} is total; \texttt{TASK} is total.
+\end{itemize}
+
+\subsection{PRECEDES (TASK to TASK)}\label{precedes-task-to-task}
+
+\begin{itemize}
+\tightlist
+\item
+  Unary (\allowbreak{}recursive) M:N
+\item
+  Participation: Both roles are partial.
+\item
+  Rule: Defines scheduling dependencies among tasks (\allowbreak{}for example, foundation pouring finishes before structural framing begins).
+\end{itemize}
+
+\subsection{\texorpdfstring{WORKS\texorpdfstring{\_\allowbreak{}}{_}ON\texorpdfstring{\_\allowbreak{}}{_}TASK (EMPLOYEE to TASK)}{WORKSONTASK (EMPLOYEE to TASK)}}\label{works_on_task-employee-to-task}
+
+\begin{itemize}
+\tightlist
+\item
+  Binary M:N
+\item
+  Attributes: \texttt{AssignedDate}, \texttt{RoleOnTask}, \texttt{HoursLogged}
+\item
+  Participation: \texttt{EMPLOYEE} is partial; \texttt{TASK} is total (\allowbreak{}every task requires at least one assigned worker).
+\end{itemize}
+
+\subsection{\texorpdfstring{EQUIPMENT\texorpdfstring{\_\allowbreak{}}{_}DEPLOYMENT (EQUIPMENT to PROJECT\texorpdfstring{\_\allowbreak{}}{_}SITE)}{EQUIPMENTDEPLOYMENT (EQUIPMENT to PROJECTSITE)}}\label{equipment_deployment-equipment-to-project_site}
+
+\begin{itemize}
+\tightlist
+\item
+  Binary M:N (\allowbreak{}modeled as an aggregation for operator assignment)
+\item
+  Attributes: \texttt{DeploymentStartDate}, \texttt{DeploymentEndDate}, \texttt{HoursOperated}
+\item
+  Participation: Both \texttt{EQUIPMENT} and \texttt{PROJECT\_\allowbreak{}SITE} are partial.
+\end{itemize}
+
+\subsection{\texorpdfstring{OPERATES (EMPLOYEE to EQUIPMENT\texorpdfstring{\_\allowbreak{}}{_}DEPLOYMENT)}{OPERATES (EMPLOYEE to EQUIPMENTDEPLOYMENT)}}\label{operates-employee-to-equipment_deployment}
+
+\begin{itemize}
+\tightlist
+\item
+  Binary 1:N over the \texttt{EQUIPMENT\_\allowbreak{}DEPLOYMENT} aggregation
+\item
+  Participation: Both \texttt{EMPLOYEE} and \texttt{EQUIPMENT\_\allowbreak{}DEPLOYMENT} are partial.
+\item
+  Rule: Associates each equipment deployment with at most one primary operator (\allowbreak{}\texttt{OperatorEmpID} in the relational schema).
+\end{itemize}
+
+\subsection{\texorpdfstring{HAS\texorpdfstring{\_\allowbreak{}}{_}MAINTENANCE (EQUIPMENT to MAINTENANCE\texorpdfstring{\_\allowbreak{}}{_}RECORD)}{HASMAINTENANCE (EQUIPMENT to MAINTENANCERECORD)}}\label{has_maintenance-equipment-to-maintenance_record}
+
+\begin{itemize}
+\tightlist
+\item
+  Identifying 1:N
+\item
+  Participation: \texttt{EQUIPMENT} is partial; \texttt{MAINTENANCE\_\allowbreak{}RECORD} is total.
+\end{itemize}
+
+\subsection{\texorpdfstring{ISSUES\texorpdfstring{\_\allowbreak{}}{_}PO (PROJECT to PURCHASE\texorpdfstring{\_\allowbreak{}}{_}ORDER)}{ISSUESPO (PROJECT to PURCHASEORDER)}}\label{issues_po-project-to-purchase_order}
+
+\begin{itemize}
+\tightlist
+\item
+  Binary 1:N
+\item
+  Participation: \texttt{PROJECT} is partial; \texttt{PURCHASE\_\allowbreak{}ORDER} is total.
+\end{itemize}
+
+\subsection{\texorpdfstring{SUPPLIES\texorpdfstring{\_\allowbreak{}}{_}PO (SUPPLIER to PURCHASE\texorpdfstring{\_\allowbreak{}}{_}ORDER)}{SUPPLIESPO (SUPPLIER to PURCHASEORDER)}}\label{supplies_po-supplier-to-purchase_order}
+
+\begin{itemize}
+\tightlist
+\item
+  Binary 1:N
+\item
+  Participation: \texttt{SUPPLIER} is partial; \texttt{PURCHASE\_\allowbreak{}ORDER} is total.
+\end{itemize}
+
+\subsection{\texorpdfstring{CONTAINS\texorpdfstring{\_\allowbreak{}}{_}ITEM (PURCHASE\texorpdfstring{\_\allowbreak{}}{_}ORDER to PO\texorpdfstring{\_\allowbreak{}}{_}ITEM)}{CONTAINSITEM (PURCHASEORDER to POITEM)}}\label{contains_item-purchase_order-to-po_item}
+
+\begin{itemize}
+\tightlist
+\item
+  Identifying 1:N
+\item
+  Participation: \texttt{PURCHASE\_\allowbreak{}ORDER} is total; \texttt{PO\_\allowbreak{}ITEM} is total.
+\end{itemize}
+
+\subsection{\texorpdfstring{ITEM\texorpdfstring{\_\allowbreak{}}{_}REFERENCES\texorpdfstring{\_\allowbreak{}}{_}MATERIAL (PO\texorpdfstring{\_\allowbreak{}}{_}ITEM to MATERIAL)}{ITEMREFERENCESMATERIAL (POITEM to MATERIAL)}}\label{item_references_material-po_item-to-material}
+
+\begin{itemize}
+\tightlist
+\item
+  Binary N:1
+\item
+  Participation: \texttt{PO\_\allowbreak{}ITEM} is total; \texttt{MATERIAL} is partial.
+\end{itemize}
+
+\subsection{\texorpdfstring{SITE\texorpdfstring{\_\allowbreak{}}{_}INVENTORY (PROJECT\texorpdfstring{\_\allowbreak{}}{_}SITE to MATERIAL)}{SITEINVENTORY (PROJECTSITE to MATERIAL)}}\label{site_inventory-project_site-to-material}
+
+\begin{itemize}
+\tightlist
+\item
+  Binary M:N
+\item
+  Attributes: \texttt{CurrentStockQuantity}, \texttt{SafetyReorderQuantity}, \texttt{LastStocktakeDate}
+\item
+  Participation: Both \texttt{PROJECT\_\allowbreak{}SITE} and \texttt{MATERIAL} are partial.
+\end{itemize}
+
+\subsection{\texorpdfstring{DELIVERY\texorpdfstring{\_\allowbreak{}}{_}DISPATCH (SUPPLIER x MATERIAL x PROJECT\texorpdfstring{\_\allowbreak{}}{_}SITE)}{DELIVERYDISPATCH (SUPPLIER x MATERIAL x PROJECTSITE)}}\label{delivery_dispatch-supplier-x-material-x-project_site}
+
+\begin{itemize}
+\tightlist
+\item
+  Ternary M:N:P (\allowbreak{}modeled as an aggregation for purchase-order fulfillment and receiving verification)
+\item
+  Attributes: \texttt{DeliveryCode}, \texttt{DeliveryDate}, \texttt{DeliveredQuantity}
+\item
+  Participation: \texttt{SUPPLIER}, \texttt{MATERIAL}, and \texttt{PROJECT\_\allowbreak{}SITE} are all partial.
+\item
+  Rule: Captures each shipment of a specific material delivered by a supplier to a project site on a given date.
+\end{itemize}
+
+\subsection{\texorpdfstring{FULFILLS\texorpdfstring{\_\allowbreak{}}{_}PO (PURCHASE\texorpdfstring{\_\allowbreak{}}{_}ORDER to DELIVERY\texorpdfstring{\_\allowbreak{}}{_}DISPATCH)}{FULFILLSPO (PURCHASEORDER to DELIVERYDISPATCH)}}\label{fulfills_po-purchase_order-to-delivery_dispatch}
+
+\begin{itemize}
+\tightlist
+\item
+  Binary 1:N over the \texttt{DELIVERY\_\allowbreak{}DISPATCH} aggregation
+\item
+  Participation: \texttt{PURCHASE\_\allowbreak{}ORDER} is partial; \texttt{DELIVERY\_\allowbreak{}DISPATCH} is total (\allowbreak{}every delivery fulfills an approved purchase order).
+\end{itemize}
+
+\subsection{\texorpdfstring{RECEIVES\texorpdfstring{\_\allowbreak{}}{_}DELIVERY (EMPLOYEE to DELIVERY\texorpdfstring{\_\allowbreak{}}{_}DISPATCH)}{RECEIVESDELIVERY (EMPLOYEE to DELIVERYDISPATCH)}}\label{receives_delivery-employee-to-delivery_dispatch}
+
+\begin{itemize}
+\tightlist
+\item
+  Binary 1:N over the \texttt{DELIVERY\_\allowbreak{}DISPATCH} aggregation
+\item
+  Participation: \texttt{EMPLOYEE} is partial; \texttt{DELIVERY\_\allowbreak{}DISPATCH} is total (\allowbreak{}every delivery is signed off by a receiving employee).
+\end{itemize}
+
+\subsection{\texorpdfstring{MATERIAL\texorpdfstring{\_\allowbreak{}}{_}USAGE (TASK x MATERIAL x PROJECT\texorpdfstring{\_\allowbreak{}}{_}SITE)}{MATERIALUSAGE (TASK x MATERIAL x PROJECTSITE)}}\label{material_usage-task-x-material-x-project_site}
+
+\begin{itemize}
+\tightlist
+\item
+  Ternary N:M:P
+\item
+  Attributes: \texttt{UsageDate}, \texttt{QuantityUsed}
+\item
+  Participation: \texttt{TASK}, \texttt{MATERIAL}, and \texttt{PROJECT\_\allowbreak{}SITE} are all partial.
+\item
+  Rule: Records the quantity of a material consumed from a specific site inventory by a task on a given date.
+\end{itemize}
+
+\subsection{\texorpdfstring{ENGAGES\texorpdfstring{\_\allowbreak{}}{_}SUBCONTRACTOR (PROJECT to SUBCONTRACTOR)}{ENGAGESSUBCONTRACTOR (PROJECT to SUBCONTRACTOR)}}\label{engages_subcontractor-project-to-subcontractor}
+
+\begin{itemize}
+\tightlist
+\item
+  Binary M:N
+\item
+  Attributes: \texttt{ContractAgreementNo}, \texttt{ScopeDescription}, \texttt{ContractValue}, \texttt{WarrantyHoldRate}, \texttt{StartDate}, \texttt{CompletionDate}
+\item
+  Participation: Both \texttt{PROJECT} and \texttt{SUBCONTRACTOR} are partial.
+\end{itemize}
+
+\subsection{\texorpdfstring{HAS\texorpdfstring{\_\allowbreak{}}{_}INSPECTION (PROJECT\texorpdfstring{\_\allowbreak{}}{_}SITE to SAFETY\texorpdfstring{\_\allowbreak{}}{_}INSPECTION)}{HASINSPECTION (PROJECTSITE to SAFETYINSPECTION)}}\label{has_inspection-project_site-to-safety_inspection}
+
+\begin{itemize}
+\tightlist
+\item
+  Binary 1:N
+\item
+  Participation: \texttt{PROJECT\_\allowbreak{}SITE} is partial; \texttt{SAFETY\_\allowbreak{}INSPECTION} is total (\allowbreak{}every safety audit targets one site).
+\end{itemize}
+
+\subsection{\texorpdfstring{PERFORMS\texorpdfstring{\_\allowbreak{}}{_}INSPECTION (EMPLOYEE to SAFETY\texorpdfstring{\_\allowbreak{}}{_}INSPECTION)}{PERFORMSINSPECTION (EMPLOYEE to SAFETYINSPECTION)}}\label{performs_inspection-employee-to-safety_inspection}
+
+\begin{itemize}
+\tightlist
+\item
+  Binary 1:N
+\item
+  Participation: \texttt{EMPLOYEE} is partial; \texttt{SAFETY\_\allowbreak{}INSPECTION} is total (\allowbreak{}every safety audit is conducted by one assigned inspector).
+\end{itemize}
+
+\subsection{\texorpdfstring{LOGS\texorpdfstring{\_\allowbreak{}}{_}INCIDENT (PROJECT\texorpdfstring{\_\allowbreak{}}{_}SITE to INCIDENT\texorpdfstring{\_\allowbreak{}}{_}REPORT)}{LOGSINCIDENT (PROJECTSITE to INCIDENTREPORT)}}\label{logs_incident-project_site-to-incident_report}
+
+\begin{itemize}
+\tightlist
+\item
+  Binary 1:N
+\item
+  Participation: \texttt{PROJECT\_\allowbreak{}SITE} is partial; \texttt{INCIDENT\_\allowbreak{}REPORT} is total (\allowbreak{}every incident occurs at a project site).
+\end{itemize}
+
+\subsection{\texorpdfstring{INVOLVES\texorpdfstring{\_\allowbreak{}}{_}EMPLOYEE (EMPLOYEE to INCIDENT\texorpdfstring{\_\allowbreak{}}{_}REPORT)}{INVOLVESEMPLOYEE (EMPLOYEE to INCIDENTREPORT)}}\label{involves_employee-employee-to-incident_report}
+
+\begin{itemize}
+\tightlist
+\item
+  Binary 1:N
+\item
+  Participation: Both \texttt{EMPLOYEE} and \texttt{INCIDENT\_\allowbreak{}REPORT} are partial (\allowbreak{}an incident may involve an injured worker or only physical property/equipment).
+\item
+  Rule: An incident report references at most one primary affected employee.
+\end{itemize}
+
+\subsection{\texorpdfstring{DAMAGES\texorpdfstring{\_\allowbreak{}}{_}EQUIPMENT (EQUIPMENT to INCIDENT\texorpdfstring{\_\allowbreak{}}{_}REPORT)}{DAMAGESEQUIPMENT (EQUIPMENT to INCIDENTREPORT)}}\label{damages_equipment-equipment-to-incident_report}
+
+\begin{itemize}
+\tightlist
+\item
+  Binary 1:N
+\item
+  Participation: Both \texttt{EQUIPMENT} and \texttt{INCIDENT\_\allowbreak{}REPORT} are partial (\allowbreak{}an incident may or may not damage a piece of machinery).
+\end{itemize}
+
+\chapter{Business rules}\label{business-rules}
+
+\section{Domain constraints}\label{domain-constraints}
+
+Numeric attributes enforce strict positivity or non-negativity bounds across financial, inventory, and scheduling records:
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.2800}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.1400}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.5800}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Rule
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Constraint
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Applicable Attributes
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Positive monetary and rate values & \textgreater{} 0 & \texttt{Salary}, \texttt{Budget}, \texttt{EstimatedBudget}, \texttt{PhaseBudget}, \texttt{ContractValue}, \texttt{UnitPrice}, \texttt{AgreedUnitPrice}, \texttt{Cost}, \texttt{HourlyRate} \\
+Positive sequence and transaction quantities & \textgreater{} 0 & \texttt{PhaseNumber}, \texttt{LineNumber}, \texttt{RecordNumber}, \texttt{QuantityOrdered}, \texttt{DeliveredQuantity}, \texttt{QuantityUsed} \\
+Non-negative stock, hours, and counts & \textgreater= 0 & \texttt{CurrentStockQuantity}, \texttt{MinStock}, \texttt{SafetyReorderQuantity}, \texttt{EstimatedHours}, \texttt{ActualHours}, \texttt{HoursLogged}, \texttt{HoursOperated}, \texttt{TotalRunHours}, \texttt{LostDays} \\
+Bounded ratings and percentages & Range check & \texttt{SafetyRatingScore} (\allowbreak{}0.0 to 10.0), \texttt{OverallScore} (\allowbreak{}0 to 100), \texttt{WarrantyHoldRate} (\allowbreak{}0.00 to 100.00) \\
+\end{longtable}
+}
+
+Categorical and status attributes accept fixed enumerated values:
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.3600}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.6400}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Entity.\allowbreak{}Attribute
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Allowed Values
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\texttt{CLIENT.\allowbreak{}ClientType} & \texttt{Government}, \texttt{Commercial}, \texttt{Residential}, \texttt{Industrial} \\
+\texttt{DEPENDENT.\allowbreak{}Gender} & \texttt{M}, \texttt{F}, \texttt{Other} \\
+\texttt{DEPENDENT.\allowbreak{}Relationship} & \texttt{Spouse}, \texttt{Child}, \texttt{Parent} \\
+\texttt{PROJECT.\allowbreak{}Status} & \texttt{Planned}, \texttt{In-Progress}, \texttt{Suspended}, \texttt{Completed} \\
+\texttt{PROJECT\_\allowbreak{}SITE.\allowbreak{}SiteStatus} & \texttt{Preparation}, \texttt{Active}, \texttt{Handed\_\allowbreak{}Over} \\
+\texttt{PROJECT\_\allowbreak{}PHASE.\allowbreak{}PhaseStatus} & \texttt{Pending}, \texttt{Active}, \texttt{Under-Inspection}, \texttt{Accepted} \\
+\texttt{TASK.\allowbreak{}PriorityLevel} & \texttt{Low}, \texttt{Medium}, \texttt{High}, \texttt{Urgent} \\
+\texttt{TASK.\allowbreak{}TaskStatus} & \texttt{Pending}, \texttt{In\_\allowbreak{}Progress}, \texttt{Completed}, \texttt{Blocked} \\
+\texttt{EQUIPMENT.\allowbreak{}Category} & \texttt{Excavator}, \texttt{Crane}, \texttt{Truck}, \texttt{Paver}, \texttt{Mixer} \\
+\texttt{EQUIPMENT.\allowbreak{}Ownership} & \texttt{Owned}, \texttt{Rented} \\
+\texttt{EQUIPMENT.\allowbreak{}CurrentStatus} & \texttt{Available}, \texttt{Deployed}, \texttt{Under-Maintenance}, \texttt{Retired} \\
+\texttt{MAINTENANCE\_\allowbreak{}RECORD.\allowbreak{}MaintenanceType} & \texttt{Oil Change}, \texttt{Inspection}, \texttt{Hydraulic Repair}, \texttt{Overhaul} \\
+\texttt{SUPPLIER.\allowbreak{}CreditRating} & \texttt{A}, \texttt{B}, \texttt{C} \\
+\texttt{MATERIAL.\allowbreak{}Category} & \texttt{Steel}, \texttt{Cement}, \texttt{Aggregate}, \texttt{Piping}, \texttt{Electrical} \\
+\texttt{PURCHASE\_\allowbreak{}ORDER.\allowbreak{}DeliveryStatus} & \texttt{Issued}, \texttt{Partial\_\allowbreak{}Delivery}, \texttt{Fulfilled}, \texttt{Cancelled} \\
+\texttt{SAFETY\_\allowbreak{}INSPECTION.\allowbreak{}InspectionType} & \texttt{Routine}, \texttt{Unannounced}, \texttt{Pre-Operation} \\
+\texttt{SAFETY\_\allowbreak{}INSPECTION.\allowbreak{}InspectionResult} & \texttt{Passed}, \texttt{Conditional\_\allowbreak{}Pass}, \texttt{Failed} \\
+\texttt{INCIDENT\_\allowbreak{}REPORT.\allowbreak{}IncidentType} & \texttt{Fall}, \texttt{Electrical}, \texttt{Equipment\_\allowbreak{}Collision}, \texttt{Falling\_\allowbreak{}Object} \\
+\texttt{INCIDENT\_\allowbreak{}REPORT.\allowbreak{}IncidentLevel} & \texttt{Warning}, \texttt{Minor}, \texttt{Serious}, \texttt{Fatal} \\
+\end{longtable}
+}
+
+\section{Date and time rules}\label{date-and-time-rules}
+
+\begin{itemize}
+\tightlist
+\item
+  Chronological endpoints must not precede start dates across all scheduled records: \texttt{PROJECT} (\allowbreak{}\texttt{StartDate \textless= PlannedEndDate}, \texttt{StartDate \textless= ActualEndDate}), \texttt{PROJECT\_\allowbreak{}PHASE} (\allowbreak{}\texttt{StartDate \textless= TargetCompletionDate}), \texttt{TASK} (\allowbreak{}\texttt{ScheduledStartDate \textless= ScheduledEndDate}, \texttt{ScheduledStartDate \textless= ActualEndDate}), \texttt{PURCHASE\_\allowbreak{}ORDER} (\allowbreak{}\texttt{OrderDate \textless= ExpectedDeliveryDate}), \texttt{EQUIPMENT\_\allowbreak{}DEPLOYMENT} (\allowbreak{}\texttt{DeploymentStartDate \textless= DeploymentEndDate}), \texttt{ENGAGES\_\allowbreak{}SUBCONTRACTOR} (\allowbreak{}\texttt{StartDate \textless= CompletionDate}), and \texttt{SAFETY\_\allowbreak{}INSPECTION} (\allowbreak{}\texttt{InspectionDate \textless= FixDeadline} when \texttt{FixDeadline} is non-null).
+\item
+  Workers must be at least 18 years old at hiring and at runtime (\allowbreak{}\texttt{CurrentDate - DOB \textgreater= 18 years} and \texttt{HireDate \textgreater= DOB + 18 years}).
+\item
+  Task \texttt{ScheduledStartDate} and \texttt{ScheduledEndDate} values must fall within the parent \texttt{PROJECT\_\allowbreak{}PHASE} interval (\allowbreak{}\texttt{StartDate} to \texttt{TargetCompletionDate}).
+\end{itemize}
+
+\section{Rules not modeled in ERD}\label{rules-not-modeled-in-erd}
+
+These cross-entity and dynamic constraints cannot be expressed directly in Chen EER notation and require triggers, check constraints, or application logic:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Phase budget limit: The sum of \texttt{PhaseBudget} across all phases of a project cannot exceed \texttt{PROJECT.\allowbreak{}EstimatedBudget}.
+\item
+  No overlapping machine bookings: An \texttt{EQUIPMENT} unit cannot have overlapping \texttt{{[}DeploymentStartDate, DeploymentEndDate{]}} intervals across different sites in \texttt{EQUIPMENT\_\allowbreak{}DEPLOYMENT}.
+\item
+  Operator licensing: An employee linked via \texttt{OPERATES} to \texttt{EQUIPMENT\_\allowbreak{}DEPLOYMENT} must hold a matching equipment license in \texttt{EMPLOYEE.\allowbreak{}Certifications}.
+\item
+  Daily work limit: Total \texttt{HoursLogged} across all \texttt{WORKS\_\allowbreak{}ON\_\allowbreak{}TASK} records for a single employee on the same \texttt{AssignedDate} cannot exceed 12 hours.
+\item
+  No circular task dependencies: The recursive \texttt{PRECEDES} graph over \texttt{TASK} must remain a directed acyclic graph (\allowbreak{}DAG) with no self-loops or cycles.
+\item
+  Stock limit on consumption: \texttt{MATERIAL\_\allowbreak{}USAGE.\allowbreak{}QuantityUsed} for a given \texttt{(\allowbreak{}\allowbreak{}MaterialID, SiteID)} cannot exceed \texttt{SITE\_\allowbreak{}INVENTORY.\allowbreak{}CurrentStockQuantity} at that site.
+\item
+  Single active project limit for directors: Although \texttt{DIRECTS\_\allowbreak{}PROJECT} is modeled as 1:1 in the conceptual schema, historical project records require enforcing that an employee directs at most one \texttt{In-Progress} project at any given time.
+\item
+  Accident emergency notification: When \texttt{INCIDENT\_\allowbreak{}REPORT} references an injured employee via \texttt{INVOLVES\_\allowbreak{}EMPLOYEE}, the system must query \texttt{DEPENDENT} where \texttt{IsEmergencyContact = true} to notify the designated emergency contact.
+\end{enumerate}
+
+\chapter{Database applications}\label{database-applications}
+
+\section{Data loading}\label{data-loading}
+
+\begin{itemize}
+\tightlist
+\item
+  Import the standard \texttt{MATERIAL} catalog with \texttt{StandardUnit} and benchmark \texttt{UnitPrice}.
+\item
+  Register \texttt{EMPLOYEE} records with \texttt{JobTitle}, assigned \texttt{DEPARTMENT}, and verified \texttt{Certifications}.
+\item
+  Initialize \texttt{PROJECT} contracts, \texttt{PROJECT\_\allowbreak{}SITE} coordinates, and \texttt{PROJECT\_\allowbreak{}PHASE} milestone schedules.
+\item
+  Register owned or rented \texttt{EQUIPMENT} assets with unique \texttt{SerialNumber} values.
+\end{itemize}
+
+\section{Updates}\label{updates}
+
+\begin{itemize}
+\tightlist
+\item
+  Log worker \texttt{HoursLogged} and \texttt{RoleOnTask} on assigned \texttt{TASK} records.
+\item
+  Record \texttt{DELIVERY\_\allowbreak{}DISPATCH} arrivals against \texttt{PURCHASE\_\allowbreak{}ORDER} items and increment \texttt{SITE\_\allowbreak{}INVENTORY.\allowbreak{}CurrentStockQuantity}.
+\item
+  Record \texttt{MATERIAL\_\allowbreak{}USAGE} quantities during task execution and deduct from on-site \texttt{CurrentStockQuantity}.
+\item
+  Accumulate \texttt{EQUIPMENT\_\allowbreak{}DEPLOYMENT.\allowbreak{}HoursOperated}, update \texttt{TotalRunHours}, and transition \texttt{CurrentStatus} to \texttt{Under-Maintenance} when service intervals arrive.
+\item
+  Transition \texttt{PROJECT\_\allowbreak{}PHASE.\allowbreak{}PhaseStatus} to \texttt{Accepted} after milestone sign-off.
+\item
+  Record \texttt{SAFETY\_\allowbreak{}INSPECTION} scores, remediation deadlines, and \texttt{INCIDENT\_\allowbreak{}REPORT} cases.
+\end{itemize}
+
+\section{Queries}\label{queries}
+
+\begin{itemize}
+\tightlist
+\item
+  Retrieve \texttt{Available} equipment by \texttt{Category} with no scheduled \texttt{EQUIPMENT\_\allowbreak{}DEPLOYMENT} overlap in the next two weeks.
+\item
+  Identify \texttt{SITE\_\allowbreak{}INVENTORY} items at a site where \texttt{CurrentStockQuantity} has fallen below \texttt{MATERIAL.\allowbreak{}MinStock} or \texttt{SafetyReorderQuantity}.
+\item
+  List \texttt{Urgent} tasks whose \texttt{TaskStatus} is not \texttt{Completed} past \texttt{ScheduledEndDate}.
+\item
+  Traverse the recursive \texttt{SUPERVISES} chain from any \texttt{EMPLOYEE} up to the general director.
+\item
+  Retrieve active subcontractors on a project with \texttt{ContractValue}, \texttt{SafetyRatingScore}, and retained \texttt{WarrantyHoldRate} amounts.
+\end{itemize}
+
+\section{Reports}\label{reports}
+
+\begin{itemize}
+\tightlist
+\item
+  Cost vs.~budget variance: Compares \texttt{PROJECT.\allowbreak{}EstimatedBudget} against aggregated spending across labor, equipment deployments, material purchases, and subcontracts (\allowbreak{}\texttt{ActualCost}).
+\item
+  Earned value analysis: Computes Planned Value (\allowbreak{}PV), Earned Value (\allowbreak{}EV), Actual Cost (\allowbreak{}AC), Cost Performance Index (\allowbreak{}CPI), and Schedule Performance Index (\allowbreak{}SPI).
+\item
+  Site safety report: Summarizes \texttt{SAFETY\_\allowbreak{}INSPECTION.\allowbreak{}OverallScore}, unresolved violations, \texttt{INCIDENT\_\allowbreak{}REPORT.\allowbreak{}LostDays}, and injury-free hours per site.
+\item
+  Subcontractor scorecard: Ranks subcontractors by schedule adherence, inspection quality, and \texttt{SafetyRatingScore}.
+\item
+  Fleet utilization report: Compares \texttt{TotalRunHours} and \texttt{HoursOperated} against idle time and \texttt{HourlyRate} cost recovery.
+\end{itemize}
+
+\chapter{Entity-Relationship Diagram}\label{entity-relationship-diagram}
+
+\section{Diagram overview and notation}\label{diagram-overview-and-notation}
+
+In Chen EER notation, rectangles denote strong entity sets, double rectangles denote weak entity sets, diamonds denote regular relationships, and double diamonds denote identifying relationships. Ellipses represent attributes: underlined for primary keys, dashed-underlined for partial keys, double-lined for multi-valued attributes, and dashed-outlined for derived attributes. Double lines indicate total participation, while single lines indicate partial participation. Cardinalities are labeled \texttt{1}, \texttt{N}, \texttt{M}, and \texttt{P}. Dashed aggregation boxes enclose \texttt{EQUIPMENT\_\allowbreak{}DEPLOYMENT} and \texttt{DELIVERY\_\allowbreak{}DISPATCH} so those relationships participate directly in \texttt{OPERATES}, \texttt{FULFILLS\_\allowbreak{}PO}, and \texttt{RECEIVES\_\allowbreak{}DELIVERY}.
+
+\landscapefigure{erd/merged.pdf}{Entity-Relationship Diagram of the A34Build database, covering 17 entity sets (13 strong, 4 weak) and 30 relationships color-coded across six operational domains.}
+
+\section{Conceptual model by domain}\label{conceptual-model-by-domain}
+
+Each of the six color-coded ERD domains groups related entity sets, relationship cardinalities, participation rules, and attribute classifications:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Organization (\allowbreak{}blue)
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Entity sets: Strong entities \texttt{DEPARTMENT} (\allowbreak{}key: \texttt{DeptID}) and \texttt{EMPLOYEE} (\allowbreak{}key: \texttt{EmpID}), plus weak entity \texttt{DEPENDENT} (\allowbreak{}identifying owner: \texttt{EMPLOYEE}; partial key: \texttt{DependentName}).
+  \item
+    Relationships: \texttt{DEPARTMENT\_\allowbreak{}HEAD} (\allowbreak{}1:1, total \texttt{DEPARTMENT}, partial \texttt{EMPLOYEE}), \texttt{WORKS\_\allowbreak{}IN\_\allowbreak{}DEPARTMENT} (\allowbreak{}1:N, total on both), \texttt{SUPERVISES} (\allowbreak{}recursive 1:N on \texttt{EMPLOYEE}, partial on both), and \texttt{HAS\_\allowbreak{}DEPENDENT} (\allowbreak{}identifying 1:N, partial \texttt{EMPLOYEE}, total \texttt{DEPENDENT}).
+  \item
+    Attribute classifications: \texttt{EMPLOYEE.\allowbreak{}Name} (\allowbreak{}\texttt{FirstName}, \texttt{MiddleName}, \texttt{LastName}) and \texttt{EMPLOYEE.\allowbreak{}Address} (\allowbreak{}\texttt{Street}, \texttt{Ward}, \texttt{District}, \texttt{City}) are composite; \texttt{Age} is derived; \texttt{Email} is a candidate key; \texttt{PhoneNumber} and \texttt{Certifications} are multi-valued.
+  \end{itemize}
+\item
+  Projects (\allowbreak{}green)
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Entity sets: Strong entities \texttt{CLIENT} (\allowbreak{}key: \texttt{ClientID}), \texttt{PROJECT} (\allowbreak{}key: \texttt{ProjectID}), \texttt{PROJECT\_\allowbreak{}SITE} (\allowbreak{}key: \texttt{SiteID}), and \texttt{TASK} (\allowbreak{}key: \texttt{TaskID}), plus weak entity \texttt{PROJECT\_\allowbreak{}PHASE} (\allowbreak{}identifying owner: \texttt{PROJECT}; partial key: \texttt{PhaseNumber}).
+  \item
+    Relationships: \texttt{COMMISSIONS} (\allowbreak{}1:N, partial \texttt{CLIENT}, total \texttt{PROJECT}), \texttt{DEPARTMENT\_\allowbreak{}SPONSORS\_\allowbreak{}PROJECT} (\allowbreak{}1:N, partial \texttt{DEPARTMENT}, total \texttt{PROJECT}), \texttt{DIRECTS\_\allowbreak{}PROJECT} (\allowbreak{}1:1, partial \texttt{EMPLOYEE}, total \texttt{PROJECT}), \texttt{HAS\_\allowbreak{}SITES} (\allowbreak{}1:N, total on both), \texttt{CONSISTS\_\allowbreak{}OF\_\allowbreak{}PHASES} (\allowbreak{}identifying 1:N, total on both), \texttt{CONTAINS\_\allowbreak{}TASKS} (\allowbreak{}1:N, total on both), \texttt{PRECEDES} (\allowbreak{}recursive M:N on \texttt{TASK}, partial on both), and \texttt{WORKS\_\allowbreak{}ON\_\allowbreak{}TASK} (\allowbreak{}M:N, partial \texttt{EMPLOYEE}, total \texttt{TASK}, with \texttt{AssignedDate}, \texttt{RoleOnTask}, \texttt{HoursLogged}).
+  \item
+    Attribute classifications: \texttt{CLIENT.\allowbreak{}TaxCode} is a candidate key and \texttt{ContactPhone} is multi-valued; \texttt{PROJECT\_\allowbreak{}SITE} has composite \texttt{LocationCoordinates} (\allowbreak{}\texttt{Latitude}, \texttt{Longitude}) and composite \texttt{Address} (\allowbreak{}\texttt{StreetAddress}, \texttt{District}, \texttt{City\_\allowbreak{}Province}); \texttt{PROJECT.\allowbreak{}ProjectDuration}, \texttt{PROJECT.\allowbreak{}ActualCost}, and \texttt{TASK.\allowbreak{}ActualHours} are derived.
+  \end{itemize}
+\item
+  Equipment (\allowbreak{}orange)
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Entity sets: Strong entity \texttt{EQUIPMENT} (\allowbreak{}key: \texttt{EquipmentID}) and weak entity \texttt{MAINTENANCE\_\allowbreak{}RECORD} (\allowbreak{}identifying owner: \texttt{EQUIPMENT}; partial key: \texttt{RecordNumber}).
+  \item
+    Relationships: \texttt{HAS\_\allowbreak{}MAINTENANCE} (\allowbreak{}identifying 1:N, partial \texttt{EQUIPMENT}, total \texttt{MAINTENANCE\_\allowbreak{}RECORD}), \texttt{EQUIPMENT\_\allowbreak{}DEPLOYMENT} (\allowbreak{}M:N between \texttt{EQUIPMENT} and \texttt{PROJECT\_\allowbreak{}SITE}, partial on both, with \texttt{DeploymentStartDate}, \texttt{DeploymentEndDate}, \texttt{HoursOperated}), and \texttt{OPERATES} (\allowbreak{}1:N between \texttt{EMPLOYEE} and the \texttt{EQUIPMENT\_\allowbreak{}DEPLOYMENT} aggregation, partial on both).
+  \item
+    Attribute classifications: \texttt{EQUIPMENT.\allowbreak{}SerialNumber} is a candidate key; \texttt{TotalRunHours} is derived; \texttt{EQUIPMENT\_\allowbreak{}DEPLOYMENT} acts as an aggregation so operator assignment attaches directly via \texttt{OPERATES}.
+  \end{itemize}
+\item
+  Materials and procurement (\allowbreak{}purple)
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Entity sets: Strong entities \texttt{SUPPLIER} (\allowbreak{}key: \texttt{SupplierID}), \texttt{PURCHASE\_\allowbreak{}ORDER} (\allowbreak{}key: \texttt{PO\_\allowbreak{}ID}), and \texttt{MATERIAL} (\allowbreak{}key: \texttt{MaterialID}), plus weak entity \texttt{PO\_\allowbreak{}ITEM} (\allowbreak{}identifying owner: \texttt{PURCHASE\_\allowbreak{}ORDER}; partial key: \texttt{LineNumber}).
+  \item
+    Relationships: \texttt{ISSUES\_\allowbreak{}PO} (\allowbreak{}\texttt{PROJECT} 1:N \texttt{PURCHASE\_\allowbreak{}ORDER}, partial \texttt{PROJECT}, total \texttt{PURCHASE\_\allowbreak{}ORDER}), \texttt{SUPPLIES\_\allowbreak{}PO} (\allowbreak{}\texttt{SUPPLIER} 1:N \texttt{PURCHASE\_\allowbreak{}ORDER}, partial \texttt{SUPPLIER}, total \texttt{PURCHASE\_\allowbreak{}ORDER}), \texttt{CONTAINS\_\allowbreak{}ITEM} (\allowbreak{}identifying 1:N, total on both), \texttt{ITEM\_\allowbreak{}REFERENCES\_\allowbreak{}MATERIAL} (\allowbreak{}\texttt{PO\_\allowbreak{}ITEM} N:1 \texttt{MATERIAL}, total \texttt{PO\_\allowbreak{}ITEM}, partial \texttt{MATERIAL}), \texttt{SITE\_\allowbreak{}INVENTORY} (\allowbreak{}\texttt{PROJECT\_\allowbreak{}SITE} M:N \texttt{MATERIAL}, partial on both, with \texttt{CurrentStockQuantity}, \texttt{SafetyReorderQuantity}, \texttt{LastStocktakeDate}), ternary \texttt{DELIVERY\_\allowbreak{}DISPATCH} (\allowbreak{}\texttt{SUPPLIER} x \texttt{MATERIAL} x \texttt{PROJECT\_\allowbreak{}SITE}, all partial, with \texttt{DeliveryCode}, \texttt{DeliveryDate}, \texttt{DeliveredQuantity}), \texttt{FULFILLS\_\allowbreak{}PO} (\allowbreak{}\texttt{PURCHASE\_\allowbreak{}ORDER} 1:N over \texttt{DELIVERY\_\allowbreak{}DISPATCH} aggregation, partial \texttt{PURCHASE\_\allowbreak{}ORDER}, total \texttt{DELIVERY\_\allowbreak{}DISPATCH}), \texttt{RECEIVES\_\allowbreak{}DELIVERY} (\allowbreak{}\texttt{EMPLOYEE} 1:N over \texttt{DELIVERY\_\allowbreak{}DISPATCH} aggregation, partial \texttt{EMPLOYEE}, total \texttt{DELIVERY\_\allowbreak{}DISPATCH}), and ternary \texttt{MATERIAL\_\allowbreak{}USAGE} (\allowbreak{}\texttt{TASK} x \texttt{MATERIAL} x \texttt{PROJECT\_\allowbreak{}SITE}, all partial, with \texttt{UsageDate}, \texttt{QuantityUsed}).
+  \item
+    Attribute classifications: \texttt{SUPPLIER.\allowbreak{}TaxCode} is a candidate key, while \texttt{ContactPhone} and \texttt{SupplyCategories} are multi-valued; \texttt{PO\_\allowbreak{}ITEM.\allowbreak{}ItemSubtotal} and \texttt{PURCHASE\_\allowbreak{}ORDER.\allowbreak{}TotalPOAmount} are derived; \texttt{DELIVERY\_\allowbreak{}DISPATCH} is wrapped as an aggregation to attach purchase-order fulfillment and receiving verification.
+  \end{itemize}
+\item
+  Subcontractors (\allowbreak{}yellow)
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Entity sets: Strong entity \texttt{SUBCONTRACTOR} (\allowbreak{}key: \texttt{SubcontractorID}), connected across domains to \texttt{PROJECT}.
+  \item
+    Relationships: \texttt{ENGAGES\_\allowbreak{}SUBCONTRACTOR} (\allowbreak{}M:N between \texttt{PROJECT} and \texttt{SUBCONTRACTOR}, partial on both, carrying \texttt{ContractAgreementNo}, \texttt{ScopeDescription}, \texttt{ContractValue}, \texttt{WarrantyHoldRate}, \texttt{StartDate}, and \texttt{CompletionDate}).
+  \item
+    Attribute classifications: \texttt{SUBCONTRACTOR.\allowbreak{}TaxCode} and \texttt{SUBCONTRACTOR.\allowbreak{}LicenseNumber} are candidate keys; \texttt{ContractAgreementNo} uniquely identifies each engagement contract across projects.
+  \end{itemize}
+\item
+  Safety (\allowbreak{}red)
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Entity sets: Strong entities \texttt{SAFETY\_\allowbreak{}INSPECTION} (\allowbreak{}key: \texttt{InspectionID}) and \texttt{INCIDENT\_\allowbreak{}REPORT} (\allowbreak{}key: \texttt{IncidentID}).
+  \item
+    Relationships: \texttt{HAS\_\allowbreak{}INSPECTION} (\allowbreak{}\texttt{PROJECT\_\allowbreak{}SITE} 1:N \texttt{SAFETY\_\allowbreak{}INSPECTION}, partial \texttt{PROJECT\_\allowbreak{}SITE}, total \texttt{SAFETY\_\allowbreak{}INSPECTION}), \texttt{PERFORMS\_\allowbreak{}INSPECTION} (\allowbreak{}\texttt{EMPLOYEE} 1:N \texttt{SAFETY\_\allowbreak{}INSPECTION}, partial \texttt{EMPLOYEE}, total \texttt{SAFETY\_\allowbreak{}INSPECTION}), \texttt{LOGS\_\allowbreak{}INCIDENT} (\allowbreak{}\texttt{PROJECT\_\allowbreak{}SITE} 1:N \texttt{INCIDENT\_\allowbreak{}REPORT}, partial \texttt{PROJECT\_\allowbreak{}SITE}, total \texttt{INCIDENT\_\allowbreak{}REPORT}), \texttt{INVOLVES\_\allowbreak{}EMPLOYEE} (\allowbreak{}\texttt{EMPLOYEE} 1:N \texttt{INCIDENT\_\allowbreak{}REPORT}, partial on both), and \texttt{DAMAGES\_\allowbreak{}EQUIPMENT} (\allowbreak{}\texttt{EQUIPMENT} 1:N \texttt{INCIDENT\_\allowbreak{}REPORT}, partial on both).
+  \item
+    Attribute and participation notes: \texttt{SAFETY\_\allowbreak{}INSPECTION.\allowbreak{}FixDeadline} applies when violations are recorded; partial participation on \texttt{INVOLVES\_\allowbreak{}EMPLOYEE} and \texttt{DAMAGES\_\allowbreak{}EQUIPMENT} allows an \texttt{INCIDENT\_\allowbreak{}REPORT} to document property-only or non-injury incidents.
+  \end{itemize}
+\end{enumerate}
+
+\chapter{Relational Schemas}\label{relational-schemas}
+
+\section{Mapping rules and diagram}\label{mapping-rules-and-diagram}
+
+Converting the Chen ERD yields 29 relation schemas under standard relational mapping rules: composite attributes (\allowbreak{}\texttt{Name}, \texttt{Address}, \texttt{LocationCoordinates}) expand into atomic scalar columns, multi-valued attributes (\allowbreak{}\texttt{ContactPhone}, \texttt{PhoneNumber}, \texttt{Certifications}, \texttt{SupplyCategories}) map to dedicated child tables keyed by owner key plus attribute value, and derived attributes (\allowbreak{}\texttt{Age}, \texttt{ProjectDuration}, \texttt{ActualCost}, \texttt{ActualHours}, \texttt{TotalRunHours}, \texttt{ItemSubtotal}, \texttt{TotalPOAmount}) are excluded from stored columns. Weak entities inherit their identifying owner's primary key combined with their partial key, while 1:1, 1:N, M:N, ternary, and aggregation relationships map via foreign keys or associative tables. In Figure 2, underlined columns form the primary key, dashed-underlined columns mark weak-entity partial keys, and arrows point from each foreign key to its referenced primary key.
+
+\landscapefigure{schema/merged.pdf}{Relational schema of the A34Build database across 29 tables and 44 foreign-key references.}
+
+\section{Schema definitions by domain}\label{schema-definitions-by-domain}
+
+\subsection{Organization}\label{organization}
+
+\texttt{EMPLOYEE.\allowbreak{}Name} and \texttt{EMPLOYEE.\allowbreak{}Address} decompose into atomic columns, \texttt{Age} is omitted as derived, and \texttt{PhoneNumber} and \texttt{Certifications} extract into separate tables. \texttt{DEPARTMENT.\allowbreak{}HeadEmpID} and \texttt{EMPLOYEE.\allowbreak{}DeptID} form a mutual foreign-key pair resolved during physical table creation.
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2100}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2700}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2700}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Table
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Primary Key
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Attributes
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Foreign Keys
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+DEPARTMENT & \texttt{DeptID} & \texttt{DeptID}, \texttt{DeptName}, \texttt{OfficeLocation}, \texttt{Budget}, \texttt{HeadEmpID} & \texttt{HeadEmpID -\textgreater{} EMPLOYEE(\allowbreak{}\allowbreak{}EmpID)} \\
+EMPLOYEE & \texttt{EmpID} & \texttt{EmpID}, \texttt{FirstName}, \texttt{MiddleName}, \texttt{LastName}, \texttt{Street}, \texttt{Ward}, \texttt{District}, \texttt{City}, \texttt{DOB}, \texttt{HireDate}, \texttt{Salary}, \texttt{JobTitle}, \texttt{Email}, \texttt{DeptID}, \texttt{SupervisorID} & \texttt{DeptID -\textgreater{} DEPARTMENT(\allowbreak{}\allowbreak{}DeptID)}; \texttt{SupervisorID -\textgreater{} EMPLOYEE(\allowbreak{}\allowbreak{}EmpID)} \\
+EMPLOYEE\_\allowbreak{}PHONE & \texttt{EmpID}, \texttt{PhoneNumber} & \texttt{EmpID}, \texttt{PhoneNumber} & \texttt{EmpID -\textgreater{} EMPLOYEE(\allowbreak{}\allowbreak{}EmpID)} \\
+EMPLOYEE\_\allowbreak{}CERTIFICATION & \texttt{EmpID}, \texttt{Certification} & \texttt{EmpID}, \texttt{Certification} & \texttt{EmpID -\textgreater{} EMPLOYEE(\allowbreak{}\allowbreak{}EmpID)} \\
+DEPENDENT & \texttt{EmpID}, \texttt{DependentName} (\allowbreak{}partial key) & \texttt{EmpID}, \texttt{DependentName}, \texttt{Gender}, \texttt{BirthDate}, \texttt{Relationship}, \texttt{ContactPhone}, \texttt{IsEmergencyContact} & \texttt{EmpID -\textgreater{} EMPLOYEE(\allowbreak{}\allowbreak{}EmpID)} \\
+\end{longtable}
+}
+
+\subsection{Projects}\label{projects}
+
+\texttt{CLIENT.\allowbreak{}ContactPhone} extracts into \texttt{CLIENT\_\allowbreak{}PHONE}, \texttt{PROJECT\_\allowbreak{}SITE} expands composite \texttt{LocationCoordinates} and \texttt{Address} into atomic columns, derived attributes (\allowbreak{}\texttt{ProjectDuration}, \texttt{ActualCost}, \texttt{ActualHours}) are omitted, and \texttt{TASK} references \texttt{PROJECT\_\allowbreak{}PHASE} through the composite foreign key \texttt{(\allowbreak{}\allowbreak{}ProjectID, PhaseNumber)}.
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2100}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2700}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2700}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Table
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Primary Key
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Attributes
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Foreign Keys
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+CLIENT & \texttt{ClientID} & \texttt{ClientID}, \texttt{ClientName}, \texttt{ClientType}, \texttt{ContactPerson}, \texttt{ContactEmail}, \texttt{TaxCode} & \emph{None} \\
+CLIENT\_\allowbreak{}PHONE & \texttt{ClientID}, \texttt{ContactPhone} & \texttt{ClientID}, \texttt{ContactPhone} & \texttt{ClientID -\textgreater{} CLIENT(\allowbreak{}\allowbreak{}ClientID)} \\
+PROJECT & \texttt{ProjectID} & \texttt{ProjectID}, \texttt{ProjectName}, \texttt{StartDate}, \texttt{PlannedEndDate}, \texttt{ActualEndDate}, \texttt{EstimatedBudget}, \texttt{Status}, \texttt{ClientID}, \texttt{DeptID}, \texttt{DirectorEmpID} & \texttt{ClientID -\textgreater{} CLIENT(\allowbreak{}\allowbreak{}ClientID)}; \texttt{DeptID -\textgreater{} DEPARTMENT(\allowbreak{}\allowbreak{}DeptID)}; \texttt{DirectorEmpID -\textgreater{} EMPLOYEE(\allowbreak{}\allowbreak{}EmpID)} \\
+PROJECT\_\allowbreak{}SITE & \texttt{SiteID} & \texttt{SiteID}, \texttt{ProjectID}, \texttt{SiteName}, \texttt{Latitude}, \texttt{Longitude}, \texttt{StreetAddress}, \texttt{District}, \texttt{City\_\allowbreak{}Province}, \texttt{EnvironmentalPermit}, \texttt{SiteStatus} & \texttt{ProjectID -\textgreater{} PROJECT(\allowbreak{}\allowbreak{}ProjectID)} \\
+PROJECT\_\allowbreak{}PHASE & \texttt{ProjectID}, \texttt{PhaseNumber} (\allowbreak{}partial key) & \texttt{ProjectID}, \texttt{PhaseNumber}, \texttt{PhaseTitle}, \texttt{StartDate}, \texttt{TargetCompletionDate}, \texttt{PhaseBudget}, \texttt{PhaseStatus} & \texttt{ProjectID -\textgreater{} PROJECT(\allowbreak{}\allowbreak{}ProjectID)} \\
+TASK & \texttt{TaskID} & \texttt{TaskID}, \texttt{TaskName}, \texttt{EstimatedHours}, \texttt{ScheduledStartDate}, \texttt{ScheduledEndDate}, \texttt{ActualEndDate}, \texttt{PriorityLevel}, \texttt{TaskStatus}, \texttt{ProjectID}, \texttt{PhaseNumber} & \texttt{(\allowbreak{}\allowbreak{}ProjectID, PhaseNumber) -\textgreater{} PROJECT\_\allowbreak{}PHASE(\allowbreak{}\allowbreak{}ProjectID, PhaseNumber)} \\
+PRECEDES & \texttt{PredecessorTaskID}, \texttt{SuccessorTaskID} & \texttt{PredecessorTaskID}, \texttt{SuccessorTaskID} & \texttt{PredecessorTaskID -\textgreater{} TASK(\allowbreak{}\allowbreak{}TaskID)}; \texttt{SuccessorTaskID -\textgreater{} TASK(\allowbreak{}\allowbreak{}TaskID)} \\
+WORKS\_\allowbreak{}ON\_\allowbreak{}TASK & \texttt{EmpID}, \texttt{TaskID} & \texttt{EmpID}, \texttt{TaskID}, \texttt{AssignedDate}, \texttt{RoleOnTask}, \texttt{HoursLogged} & \texttt{EmpID -\textgreater{} EMPLOYEE(\allowbreak{}\allowbreak{}EmpID)}; \texttt{TaskID -\textgreater{} TASK(\allowbreak{}\allowbreak{}TaskID)} \\
+\end{longtable}
+}
+
+\subsection{Equipment}\label{equipment-1}
+
+\texttt{EQUIPMENT} omits derived \texttt{TotalRunHours}, \texttt{MAINTENANCE\_\allowbreak{}RECORD} inherits \texttt{EquipmentID} with partial key \texttt{RecordNumber}, and \texttt{EQUIPMENT\_\allowbreak{}DEPLOYMENT} adds \texttt{OperatorEmpID} from the \texttt{OPERATES} aggregation relationship.
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2100}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2700}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2700}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Table
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Primary Key
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Attributes
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Foreign Keys
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+EQUIPMENT & \texttt{EquipmentID} & \texttt{EquipmentID}, \texttt{Model}, \texttt{SerialNumber}, \texttt{Category}, \texttt{Ownership}, \texttt{HourlyRate}, \texttt{CurrentStatus} & \emph{None} \\
+MAINTENANCE\_\allowbreak{}RECORD & \texttt{EquipmentID}, \texttt{RecordNumber} (\allowbreak{}partial key) & \texttt{EquipmentID}, \texttt{RecordNumber}, \texttt{ServiceDate}, \texttt{MaintenanceType}, \texttt{Cost}, \texttt{ServiceVendor} & \texttt{EquipmentID -\textgreater{} EQUIPMENT(\allowbreak{}\allowbreak{}EquipmentID)} \\
+EQUIPMENT\_\allowbreak{}DEPLOYMENT & \texttt{EquipmentID}, \texttt{SiteID}, \texttt{DeploymentStartDate} & \texttt{EquipmentID}, \texttt{SiteID}, \texttt{DeploymentStartDate}, \texttt{DeploymentEndDate}, \texttt{HoursOperated}, \texttt{OperatorEmpID} & \texttt{EquipmentID -\textgreater{} EQUIPMENT(\allowbreak{}\allowbreak{}EquipmentID)}; \texttt{SiteID -\textgreater{} PROJECT\_\allowbreak{}SITE(\allowbreak{}\allowbreak{}SiteID)}; \texttt{OperatorEmpID -\textgreater{} EMPLOYEE(\allowbreak{}\allowbreak{}EmpID)} \\
+\end{longtable}
+}
+
+\subsection{Materials and procurement}\label{materials-and-procurement}
+
+\texttt{SUPPLIER\_\allowbreak{}PHONE} and \texttt{SUPPLIER\_\allowbreak{}CATEGORY} extract multi-valued supplier attributes, derived \texttt{TotalPOAmount} and \texttt{ItemSubtotal} are omitted, \texttt{DELIVERY\_\allowbreak{}DISPATCH} adds \texttt{PO\_\allowbreak{}ID} (\allowbreak{}\texttt{FULFILLS\_\allowbreak{}PO}) and \texttt{ReceivedByEmpID} (\allowbreak{}\texttt{RECEIVES\_\allowbreak{}DELIVERY}) from aggregation links, and \texttt{MATERIAL\_\allowbreak{}USAGE} maps the ternary consumption relationship.
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2100}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2700}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2700}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Table
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Primary Key
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Attributes
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Foreign Keys
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+SUPPLIER & \texttt{SupplierID} & \texttt{SupplierID}, \texttt{CompanyName}, \texttt{TaxCode}, \texttt{ContactEmail}, \texttt{CreditRating} & \emph{None} \\
+SUPPLIER\_\allowbreak{}PHONE & \texttt{SupplierID}, \texttt{ContactPhone} & \texttt{SupplierID}, \texttt{ContactPhone} & \texttt{SupplierID -\textgreater{} SUPPLIER(\allowbreak{}\allowbreak{}SupplierID)} \\
+SUPPLIER\_\allowbreak{}CATEGORY & \texttt{SupplierID}, \texttt{SupplyCategory} & \texttt{SupplierID}, \texttt{SupplyCategory} & \texttt{SupplierID -\textgreater{} SUPPLIER(\allowbreak{}\allowbreak{}SupplierID)} \\
+MATERIAL & \texttt{MaterialID} & \texttt{MaterialID}, \texttt{MaterialName}, \texttt{Category}, \texttt{StandardUnit}, \texttt{UnitPrice}, \texttt{MinStock} & \emph{None} \\
+PURCHASE\_\allowbreak{}ORDER & \texttt{PO\_\allowbreak{}ID} & \texttt{PO\_\allowbreak{}ID}, \texttt{OrderDate}, \texttt{ExpectedDeliveryDate}, \texttt{DeliveryStatus}, \texttt{ProjectID}, \texttt{SupplierID} & \texttt{ProjectID -\textgreater{} PROJECT(\allowbreak{}\allowbreak{}ProjectID)}; \texttt{SupplierID -\textgreater{} SUPPLIER(\allowbreak{}\allowbreak{}SupplierID)} \\
+PO\_\allowbreak{}ITEM & \texttt{PO\_\allowbreak{}ID}, \texttt{LineNumber} (\allowbreak{}partial key) & \texttt{PO\_\allowbreak{}ID}, \texttt{LineNumber}, \texttt{QuantityOrdered}, \texttt{AgreedUnitPrice}, \texttt{MaterialID} & \texttt{PO\_\allowbreak{}ID -\textgreater{} PURCHASE\_\allowbreak{}ORDER(\allowbreak{}\allowbreak{}PO\_\allowbreak{}ID)}; \texttt{MaterialID -\textgreater{} MATERIAL(\allowbreak{}\allowbreak{}MaterialID)} \\
+SITE\_\allowbreak{}INVENTORY & \texttt{SiteID}, \texttt{MaterialID} & \texttt{SiteID}, \texttt{MaterialID}, \texttt{CurrentStockQuantity}, \texttt{SafetyReorderQuantity}, \texttt{LastStocktakeDate} & \texttt{SiteID -\textgreater{} PROJECT\_\allowbreak{}SITE(\allowbreak{}\allowbreak{}SiteID)}; \texttt{MaterialID -\textgreater{} MATERIAL(\allowbreak{}\allowbreak{}MaterialID)} \\
+DELIVERY\_\allowbreak{}DISPATCH & \texttt{DeliveryCode} & \texttt{DeliveryCode}, \texttt{SupplierID}, \texttt{MaterialID}, \texttt{SiteID}, \texttt{DeliveryDate}, \texttt{DeliveredQuantity}, \texttt{ReceivedByEmpID}, \texttt{PO\_\allowbreak{}ID} & \texttt{SupplierID -\textgreater{} SUPPLIER(\allowbreak{}\allowbreak{}SupplierID)}; \texttt{MaterialID -\textgreater{} MATERIAL(\allowbreak{}\allowbreak{}MaterialID)}; \texttt{SiteID -\textgreater{} PROJECT\_\allowbreak{}SITE(\allowbreak{}\allowbreak{}SiteID)}; \texttt{ReceivedByEmpID -\textgreater{} EMPLOYEE(\allowbreak{}\allowbreak{}EmpID)}; \texttt{PO\_\allowbreak{}ID -\textgreater{} PURCHASE\_\allowbreak{}ORDER(\allowbreak{}\allowbreak{}PO\_\allowbreak{}ID)} \\
+MATERIAL\_\allowbreak{}USAGE & \texttt{TaskID}, \texttt{MaterialID}, \texttt{SiteID}, \texttt{UsageDate} & \texttt{TaskID}, \texttt{MaterialID}, \texttt{SiteID}, \texttt{UsageDate}, \texttt{QuantityUsed} & \texttt{TaskID -\textgreater{} TASK(\allowbreak{}\allowbreak{}TaskID)}; \texttt{MaterialID -\textgreater{} MATERIAL(\allowbreak{}\allowbreak{}MaterialID)}; \texttt{SiteID -\textgreater{} PROJECT\_\allowbreak{}SITE(\allowbreak{}\allowbreak{}SiteID)} \\
+\end{longtable}
+}
+
+\subsection{Subcontractors}\label{subcontractors}
+
+\texttt{ENGAGES\_\allowbreak{}SUBCONTRACTOR} maps to \texttt{SUBCONTRACT}, keyed by \texttt{ContractAgreementNo} and referencing both \texttt{PROJECT} and \texttt{SUBCONTRACTOR}.
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2100}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2700}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2700}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Table
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Primary Key
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Attributes
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Foreign Keys
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+SUBCONTRACTOR & \texttt{SubcontractorID} & \texttt{SubcontractorID}, \texttt{CompanyName}, \texttt{TaxCode}, \texttt{ContactEmail}, \texttt{ContactPhone}, \texttt{TradeSpecialty}, \texttt{LicenseNumber}, \texttt{SafetyRatingScore} & \emph{None} \\
+SUBCONTRACT & \texttt{ContractAgreementNo} & \texttt{ContractAgreementNo}, \texttt{ProjectID}, \texttt{SubcontractorID}, \texttt{ScopeDescription}, \texttt{ContractValue}, \texttt{WarrantyHoldRate}, \texttt{StartDate}, \texttt{CompletionDate} & \texttt{ProjectID -\textgreater{} PROJECT(\allowbreak{}\allowbreak{}ProjectID)}; \texttt{SubcontractorID -\textgreater{} SUBCONTRACTOR(\allowbreak{}\allowbreak{}SubcontractorID)} \\
+\end{longtable}
+}
+
+\subsection{Safety}\label{safety}
+
+Both safety tables inherit \texttt{SiteID} from \texttt{PROJECT\_\allowbreak{}SITE}. \texttt{SAFETY\_\allowbreak{}INSPECTION} stores non-null \texttt{InspectorEmpID}, whereas \texttt{INCIDENT\_\allowbreak{}REPORT} holds nullable \texttt{InvolvedEmpID} and \texttt{DamagedEquipmentID} reflecting partial participation on \texttt{INVOLVES\_\allowbreak{}EMPLOYEE} and \texttt{DAMAGES\_\allowbreak{}EQUIPMENT}.
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2100}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2700}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2700}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Table
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Primary Key
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Attributes
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Foreign Keys
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+SAFETY\_\allowbreak{}INSPECTION & \texttt{InspectionID} & \texttt{InspectionID}, \texttt{InspectionDate}, \texttt{InspectionType}, \texttt{InspectionScope}, \texttt{OverallScore}, \texttt{InspectionResult}, \texttt{ViolationNoted}, \texttt{FixDeadline}, \texttt{SiteID}, \texttt{InspectorEmpID} & \texttt{SiteID -\textgreater{} PROJECT\_\allowbreak{}SITE(\allowbreak{}\allowbreak{}SiteID)}; \texttt{InspectorEmpID -\textgreater{} EMPLOYEE(\allowbreak{}\allowbreak{}EmpID)} \\
+INCIDENT\_\allowbreak{}REPORT & \texttt{IncidentID} & \texttt{IncidentID}, \texttt{IncidentTimestamp}, \texttt{IncidentType}, \texttt{IncidentLevel}, \texttt{DamageDescription}, \texttt{LostDays}, \texttt{Solution}, \texttt{SiteID}, \texttt{InvolvedEmpID}, \texttt{DamagedEquipmentID} & \texttt{SiteID -\textgreater{} PROJECT\_\allowbreak{}SITE(\allowbreak{}\allowbreak{}SiteID)}; \texttt{InvolvedEmpID -\textgreater{} EMPLOYEE(\allowbreak{}\allowbreak{}EmpID)}; \texttt{DamagedEquipmentID -\textgreater{} EQUIPMENT(\allowbreak{}\allowbreak{}EquipmentID)} \\
+\end{longtable}
+}
+
+\end{document}

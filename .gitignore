@@ -1,1 +1,13 @@
 .agents/hooks.json
+
+# LaTeX intermediate / build artifacts
+*.aux
+*.toc
+*.lof
+*.lot
+*.log
+*.fls
+*.fdb_latexmk
+*.xdv
+*.synctex.gz
+*.out

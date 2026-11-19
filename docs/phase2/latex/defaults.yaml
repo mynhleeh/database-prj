@@ -1,0 +1,32 @@
+from: markdown
+to: latex
+standalone: true
+template: docs/phase2/latex/ptit-report.tex
+filters:
+  - docs/phase2/latex/report-prep.lua
+top-level-division: chapter
+table-of-contents: true
+toc-depth: 3
+variables:
+  lof: true
+resource-path:
+  - docs/phase2
+  - docs/phase2/latex
+wrap: none
+eol: lf
+fail-if-warnings: true
+metadata:
+  cover-logo: logo.png
+  title: DATABASE DESIGN TERM PROJECT
+  subtitle: Database system for a construction company with multiple projects
+  course: "Database [E24-Class 5]"
+  team: "5"
+  members:
+    - name: Lê Anh Minh
+      id: B24DCCE180
+    - name: Ứng Trọng Trình
+      id: B24DCCE271
+    - name: Nguyễn Đinh Anh Quân
+      id: B24DCCE222
+  instructor: Nguyễn Đình Hoá
+  location-year: "Hanoi, 2026"
