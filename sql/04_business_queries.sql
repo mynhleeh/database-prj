@@ -1,15 +1,9 @@
--- =============================================================================
--- DATABASE DESIGN TERM PROJECT (PHASE 3) - E24-Class 5, Group 5
--- Topic: Multi-Project Construction Enterprise Database System (A34Build)
--- Target DBMS: MySQL 8.0+ (Storage Engine: InnoDB, Charset: utf8mb4)
--- File 04: Business Applications, Analytical Queries & Management Reports
--- =============================================================================
+-- A34Build DB (MySQL 8.0+ / InnoDB / utf8mb4) - E24-Class 5, Group 5
+-- File 04: Operational Queries, Executive Reports & Verification
 
 USE A34Build_DB;
 
--- =============================================================================
--- PART 1: OPERATIONAL & COMPLIANCE QUERIES (SECTION 5.3)
--- =============================================================================
+-- Part 1: Operational & Compliance Queries (Section 5.3)
 
 -- Query 1.1: Heavy Equipment Availability Checker
 -- Find machinery by category that is currently 'Available' or not deployed in the next 14 days.
@@ -119,9 +113,7 @@ JOIN PROJECT p ON sc.ProjectID = p.ProjectID
 WHERE sc.EndDate >= CURDATE()
 ORDER BY sc.ContractValue DESC;
 
--- =============================================================================
--- PART 2: STRATEGIC EXECUTIVE & MANAGEMENT REPORTS (SECTION 5.4)
--- =============================================================================
+-- Part 2: Strategic Executive & Management Reports (Section 5.4)
 
 -- Report 2.1: Multi-Dimensional Project Cost vs. Budget Variance Report
 -- Aggregates budget breakdown and compares with actual costs (Labor, Machinery, Materials, Subcontracts).
@@ -266,13 +258,9 @@ LEFT JOIN MAINTENANCE_RECORD mr ON e.EquipmentID = mr.EquipmentID
 GROUP BY e.EquipmentID, e.EquipmentName, e.Category, e.HourlyRate, e.TotalRunHours
 ORDER BY LifetimeGrossRevenueGenerated DESC;
 
--- =============================================================================
--- PART 3: PROOF OF TRIGGER ENFORCEMENT & VERIFICATION
--- =============================================================================
+-- Part 3: Trigger Enforcement Verification
 
--- Verification Query 3.1: Verify Rule 8 Emergency Dispatch Trigger Execution
--- Confirms that when INC-2024-02 was created, the trigger automatically identified
--- the employee's dependent and logged an urgent emergency message!
+-- Verification Query 3.1: Confirm Rule 8 logged an emergency alert for INC-2024-02
 SELECT 
     l.LogID,
     l.IncidentID,

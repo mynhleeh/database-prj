@@ -1,9 +1,5 @@
--- =============================================================================
--- DATABASE DESIGN TERM PROJECT (PHASE 3) - E24-Class 5, Group 5
--- Topic: Multi-Project Construction Enterprise Database System (A34Build)
--- Target DBMS: MySQL 8.0+ (Storage Engine: InnoDB, Charset: utf8mb4)
--- File 03: Data Manipulation Language (DML) - Realistic Sample Data Population
--- =============================================================================
+-- A34Build DB (MySQL 8.0+ / InnoDB / utf8mb4) - E24-Class 5, Group 5
+-- File 03: Sample Data DML (Subsystems 1-5)
 
 USE A34Build_DB;
 
@@ -44,9 +40,7 @@ TRUNCATE TABLE DEPARTMENT;
 
 SET FOREIGN_KEY_CHECKS = 1;
 
--- =============================================================================
--- 1. SUBSYSTEM 1: ORGANIZATION & HUMAN RESOURCES
--- =============================================================================
+-- Subsystem 1: Organization & Human Resources (HR)
 
 -- 1.1 Insert DEPARTMENT (HeadEmpID initially NULL to resolve circular FK)
 INSERT INTO DEPARTMENT (DeptID, DeptName, OfficeLocation, Budget, HeadEmpID) VALUES
@@ -130,9 +124,7 @@ INSERT INTO DEPENDENT (EmpID, DependentName, Relationship, Gender, DOB, IsEmerge
 ('EMP011', 'Thi Kim Chi Phan', 'Spouse', 'Female', '1995-10-08', TRUE),
 ('EMP015', 'Van Sang Doan', 'Parent', 'Male', '1965-02-14', TRUE);
 
--- =============================================================================
--- 2. SUBSYSTEM 2: CLIENT & PROJECT MANAGEMENT
--- =============================================================================
+-- Subsystem 2: Client & Project Management
 
 -- 2.1 Insert CLIENT
 INSERT INTO CLIENT (ClientID, ClientName, TaxCode, RepresentativeName, Email, Street, Ward, District, City) VALUES
@@ -148,11 +140,7 @@ INSERT INTO CLIENT_PHONE (ClientID, ContactPhone) VALUES
 ('CLI03', '02363899899'),
 ('CLI04', '02438545678');
 
--- 2.3 Insert PROJECT
--- PRJ001 directed by EMP003 (Active)
--- PRJ002 directed by EMP004 (Active)
--- PRJ003 directed by EMP005 (Planning)
--- PRJ004 directed by EMP003 (Completed past project - respects Rule 7!)
+-- 2.3 Insert PROJECT (respects Rule 7: EMP003 has 1 Active + 1 Completed)
 INSERT INTO PROJECT (ProjectID, ProjectName, ContractNumber, EstimatedBudget, ActualCost, StartDate, ScheduledEndDate, ActualEndDate, Status, ClientID, DeptID, DirectorEmpID) VALUES
 ('PRJ001', 'Landmark A34 Twin Towers Complex', 'HD-2023-A34-01', 180000000000.00, 115000000000.00, '2023-03-01', '2025-06-30', NULL, 'Active', 'CLI01', 'DEP03', 'EMP003'),
 ('PRJ002', 'Coastal Highway Bridge Overpass', 'HD-2023-INFRA-08', 95000000000.00, 48000000000.00, '2023-08-15', '2025-02-28', NULL, 'Active', 'CLI03', 'DEP03', 'EMP004'),
@@ -166,10 +154,7 @@ INSERT INTO PROJECT_SITE (SiteID, SiteName, Street, Ward, District, City, Latitu
 ('SITE03', 'Coastal Bridge Pier Pier-14 to Pier-22', 'Nguyen Tat Thanh Coastal Highway', 'Hoa Hiep Nam', 'Lien Chieu', 'Da Nang', 16.08945600, 108.15678900, 'PRJ002'),
 ('SITE04', 'PTIT Campus Innovation Site', 'KM10 Nguyen Trai Road', 'Mo Lao', 'Ha Dong', 'Hanoi', 20.98012300, 105.78765400, 'PRJ003');
 
--- 2.5 Insert PROJECT_PHASE
--- Total phase budgets strictly respect Rule 1: Sum(PhaseBudget) <= EstimatedBudget!
--- PRJ001 (180B budget): 35B + 80B + 50B = 165B <= 180B
--- PRJ002 (95B budget): 25B + 45B + 20B = 90B <= 95B
+-- 2.5 Insert PROJECT_PHASE (respects Rule 1: Sum(PhaseBudget) <= EstimatedBudget)
 INSERT INTO PROJECT_PHASE (ProjectID, PhaseNumber, PhaseName, PhaseBudget, StartDate, ScheduledEndDate, ActualEndDate, Status, ProgressPercentage) VALUES
 ('PRJ001', 1, 'Site Clearance, Excavation & Deep Piling', 35000000000.00, '2023-03-01', '2023-09-30', '2023-09-28', 'Completed', 100.00),
 ('PRJ001', 2, 'Basement Diaphragm Walls & Superstructure', 80000000000.00, '2023-10-01', '2024-11-30', NULL, 'In-Progress', 78.50),
@@ -206,9 +191,7 @@ INSERT INTO WORKS_ON_TASK (EmpID, TaskID, HoursLogged, RoleDescription, Assigned
 ('EMP010', 'TSK104', 8.00, 'Material Hoisting to Podium', '2024-10-16'),
 ('EMP011', 'TSK202', 8.00, 'Gantry Support Relocation', '2024-10-16');
 
--- =============================================================================
--- 3. SUBSYSTEM 3: HEAVY MACHINERY & EQUIPMENT
--- =============================================================================
+-- Subsystem 3: Heavy Machinery & Equipment Management
 
 -- 3.1 Insert EQUIPMENT
 INSERT INTO EQUIPMENT (EquipmentID, SerialNumber, EquipmentName, Category, Capacity, HourlyRate, Status, TotalRunHours) VALUES
@@ -232,9 +215,7 @@ INSERT INTO EQUIPMENT_DEPLOYMENT (EquipmentID, DeploymentStartDate, DeploymentEn
 ('EQP001', '2024-07-01', '2024-12-31', 720.00, 'SITE01', 'EMP010'),
 ('EQP003', '2024-04-15', '2024-11-15', 850.00, 'SITE03', 'EMP011');
 
--- =============================================================================
--- 4. SUBSYSTEM 4: PROCUREMENT, INVENTORY & MATERIALS
--- =============================================================================
+-- Subsystem 4: Procurement, Inventory & Materials
 
 -- 4.1 Insert SUPPLIER
 INSERT INTO SUPPLIER (SupplierID, SupplierName, TaxCode, Email, Street, Ward, District, City) VALUES
@@ -305,9 +286,7 @@ INSERT INTO MATERIAL_USAGE (TaskID, MaterialID, SiteID, UsageDate, UsedQuantity)
 ('TSK104', 'MAT001', 'SITE01', '2024-10-14', 18.00),
 ('TSK202', 'MAT002', 'SITE03', '2024-10-15', 12.00);
 
--- =============================================================================
--- 5. SUBSYSTEM 5: SUBCONTRACTORS & SITE SAFETY ASSURANCE
--- =============================================================================
+-- Subsystem 5: Subcontractors & Site Safety Assurance
 
 -- 5.1 Insert SUBCONTRACTOR
 INSERT INTO SUBCONTRACTOR (SubcontractorID, SubcontractorName, TaxCode, Specialization, ContactPerson, ContactPhone, ContactEmail, LicenseNumber) VALUES
@@ -327,8 +306,7 @@ INSERT INTO SAFETY_INSPECTION (InspectionID, InspectionDate, InspectionType, Ins
 ('INS-2024-02', '2024-09-15', 'Weekly', 'Electrical Safety and Temporary Distribution Boards', 78.00, 'Conditional-Pass', 'Sub-panel distribution box lacked rubber weatherproofing sealing', '2024-09-18', 'SITE01', 'EMP012'),
 ('INS-2024-03', '2024-10-02', 'Surprise', 'Scaffolding Tie-Backs and Marine Working Platforms', 88.00, 'Pass', 'Adequate life vests and life buoys deployed along pier foundation', NULL, 'SITE03', 'EMP012');
 
--- 5.4 Insert INCIDENT_REPORT
--- Note: Level-2 incident with InvolvedEmpID EMP010 will trigger automated emergency dispatch log (Rule 8)!
+-- 5.4 Insert INCIDENT_REPORT (INC-2024-02 triggers Rule 8 emergency alert)
 INSERT INTO INCIDENT_REPORT (IncidentID, IncidentTimestamp, IncidentType, IncidentLevel, DamageDescription, LostDays, Solution, SiteID, InvolvedEmpID, DamagedEquipmentID) VALUES
 ('INC-2024-01', '2024-07-12 14:30:00', 'Near-Miss', 'Level-1', 'Small wooden wedge dropped from Floor 15 into safety netting, zero casualty', 0, 'Reinforced debris catchment perimeter netting and issued warning', 'SITE01', NULL, NULL),
 ('INC-2024-02', '2024-09-22 10:15:00', 'Minor-Injury', 'Level-2', 'Operator hand sprain during heavy hook stabilization in high gust wind', 3, 'Administered first aid at clinic, mandated 3-day medical leave, tightened wind speed threshold', 'SITE01', 'EMP010', 'EQP001');

@@ -1,9 +1,5 @@
--- =============================================================================
--- DATABASE DESIGN TERM PROJECT (PHASE 3) - E24-Class 5, Group 5
--- Topic: Multi-Project Construction Enterprise Database System (A34Build)
--- Target DBMS: MySQL 8.0+ (Storage Engine: InnoDB, Charset: utf8mb4)
--- File 02: Triggers, Stored Procedures & Business Rule Enforcement
--- =============================================================================
+-- A34Build DB (MySQL 8.0+ / InnoDB / utf8mb4) - E24-Class 5, Group 5
+-- File 02: Triggers & Audit Support Table (Rules 1-8)
 
 USE A34Build_DB;
 
@@ -27,10 +23,7 @@ CREATE TABLE IF NOT EXISTS EMERGENCY_DISPATCH_LOG (
 
 DELIMITER //
 
--- =============================================================================
--- BUSINESS RULE 1: Phase Budget Accumulation Constraint
--- Sum of all Phase budgets within a project must NOT exceed EstimatedBudget.
--- =============================================================================
+-- Rule 1: Phase budget total <= Project EstimatedBudget
 DROP TRIGGER IF EXISTS TRG_CHECK_PHASE_BUDGET_INSERT //
 CREATE TRIGGER TRG_CHECK_PHASE_BUDGET_INSERT
 BEFORE INSERT ON PROJECT_PHASE
@@ -76,10 +69,7 @@ BEGIN
     END IF;
 END //
 
--- =============================================================================
--- BUSINESS RULE 2: Machinery Schedule Non-Overlapping Constraint
--- A piece of equipment cannot have overlapping deployment dates across sites.
--- =============================================================================
+-- Rule 2: Non-overlapping equipment deployment intervals
 DROP TRIGGER IF EXISTS TRG_CHECK_EQUIPMENT_OVERLAP_INSERT //
 CREATE TRIGGER TRG_CHECK_EQUIPMENT_OVERLAP_INSERT
 BEFORE INSERT ON EQUIPMENT_DEPLOYMENT
@@ -119,10 +109,7 @@ BEGIN
     END IF;
 END //
 
--- =============================================================================
--- BUSINESS RULE 3: Equipment Operator Certification Rule
--- Operator assigned to heavy equipment must hold appropriate certification.
--- =============================================================================
+-- Rule 3: Operator certification must match equipment category
 DROP TRIGGER IF EXISTS TRG_CHECK_OPERATOR_CERT_INSERT //
 CREATE TRIGGER TRG_CHECK_OPERATOR_CERT_INSERT
 BEFORE INSERT ON EQUIPMENT_DEPLOYMENT
@@ -173,9 +160,7 @@ BEGIN
     END IF;
 END //
 
--- =============================================================================
--- BUSINESS RULE 4: Maximum Daily Working Hour Limit (<= 12 Hours per Calendar Day)
--- =============================================================================
+-- Rule 4: Max 12.00 logged hours per employee per day
 DROP TRIGGER IF EXISTS TRG_CHECK_DAILY_HOURS_INSERT //
 CREATE TRIGGER TRG_CHECK_DAILY_HOURS_INSERT
 BEFORE INSERT ON WORKS_ON_TASK
@@ -213,10 +198,7 @@ BEGIN
     END IF;
 END //
 
--- =============================================================================
--- BUSINESS RULE 5: Acyclic Dependency Constraint (DAG on PRECEDES)
--- Prevents circular dependency loops (e.g., T1 -> T2 -> T3 -> T1).
--- =============================================================================
+-- Rule 5: Acyclic task precedence DAG on PRECEDES
 DROP TRIGGER IF EXISTS TRG_CHECK_PRECEDES_DAG //
 CREATE TRIGGER TRG_CHECK_PRECEDES_DAG
 BEFORE INSERT ON PRECEDES
@@ -224,14 +206,13 @@ FOR EACH ROW
 BEGIN
     DECLARE v_cycle_detected INT DEFAULT 0;
 
-    -- Self-loop check is already partially enforced, but verify
+    -- Self-loop check (enforced here; MySQL Error 3823 forbids table CHECK on FK column)
     IF NEW.PredecessorTaskID = NEW.SuccessorTaskID THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Rule 5 Violation: Self-loop precedence is strictly prohibited.';
     END IF;
 
-    -- Check if a path already exists from SuccessorTaskID to PredecessorTaskID
-    -- Using CTE recursion in MySQL 8.0+
+    -- Detect path from SuccessorTaskID to PredecessorTaskID via recursive CTE
     WITH RECURSIVE PrecedenceChain AS (
         SELECT SuccessorTaskID AS CurrentTask
         FROM PRECEDES
@@ -253,9 +234,7 @@ BEGIN
     END IF;
 END //
 
--- =============================================================================
--- BUSINESS RULE 6: Material Stock Overdraft Prevention & Inventory Auto-Deduction
--- =============================================================================
+-- Rule 6: Prevent stock overdraft & auto-update inventory
 DROP TRIGGER IF EXISTS TRG_CHECK_MATERIAL_STOCK_INSERT //
 CREATE TRIGGER TRG_CHECK_MATERIAL_STOCK_INSERT
 BEFORE INSERT ON MATERIAL_USAGE
@@ -302,10 +281,7 @@ BEGIN
     END IF;
 END //
 
--- =============================================================================
--- BUSINESS RULE 7: Single Active Project Limit for Site Directors
--- 
--- =============================================================================
+-- Rule 7: At most one Active project per director
 DROP TRIGGER IF EXISTS TRG_CHECK_DIRECTOR_ACTIVE_PROJECT_INSERT //
 CREATE TRIGGER TRG_CHECK_DIRECTOR_ACTIVE_PROJECT_INSERT
 BEFORE INSERT ON PROJECT
@@ -347,10 +323,7 @@ BEGIN
     END IF;
 END //
 
--- =============================================================================
--- BUSINESS RULE 8: Automated Emergency Contact Notification on Incident
--- Finds dependent where IsEmergencyContact = TRUE and dispatches an alert.
--- =============================================================================
+-- Rule 8: Auto-log emergency alert for Level-2..4 incidents
 DROP TRIGGER IF EXISTS TRG_DISPATCH_EMERGENCY_ALERT //
 CREATE TRIGGER TRG_DISPATCH_EMERGENCY_ALERT
 AFTER INSERT ON INCIDENT_REPORT

@@ -1,9 +1,5 @@
--- =============================================================================
--- DATABASE DESIGN TERM PROJECT (PHASE 3) - E24-Class 5, Group 5
--- Topic: Multi-Project Construction Enterprise Database System (A34Build)
--- Target DBMS: MySQL 8.0+ (Storage Engine: InnoDB, Charset: utf8mb4)
--- File 01: Data Definition Language (DDL) - Relational Schema (3NF Compliant)
--- =============================================================================
+-- A34Build DB (MySQL 8.0+ / InnoDB / utf8mb4) - E24-Class 5, Group 5
+-- File 01: Schema DDL (29 Core Tables & Performance Indexes, 3NF)
 
 DROP DATABASE IF EXISTS A34Build_DB;
 CREATE DATABASE A34Build_DB
@@ -12,9 +8,7 @@ CREATE DATABASE A34Build_DB
 
 USE A34Build_DB;
 
--- =============================================================================
--- SUBSYSTEM 1: ORGANIZATION & HUMAN RESOURCES (HR)
--- =============================================================================
+-- Subsystem 1: Organization & Human Resources (HR)
 
 -- 1. Table: DEPARTMENT
 -- Note: HeadEmpID FK is added via ALTER TABLE later due to circular dependency with EMPLOYEE.
@@ -99,9 +93,7 @@ CREATE TABLE DEPENDENT (
         ON UPDATE CASCADE ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- =============================================================================
--- SUBSYSTEM 2: CLIENT & PROJECT MANAGEMENT
--- =============================================================================
+-- Subsystem 2: Client & Project Management
 
 -- 6. Table: CLIENT
 CREATE TABLE CLIENT (
@@ -256,9 +248,7 @@ CREATE TABLE WORKS_ON_TASK (
         ON UPDATE CASCADE ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- =============================================================================
--- SUBSYSTEM 3: HEAVY MACHINERY & EQUIPMENT MANAGEMENT
--- =============================================================================
+-- Subsystem 3: Heavy Machinery & Equipment Management
 
 -- 14. Table: EQUIPMENT
 CREATE TABLE EQUIPMENT (
@@ -315,9 +305,7 @@ CREATE TABLE EQUIPMENT_DEPLOYMENT (
         ON UPDATE CASCADE ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- =============================================================================
--- SUBSYSTEM 4: PROCUREMENT, INVENTORY & MATERIALS
--- =============================================================================
+-- Subsystem 4: Procurement, Inventory & Materials
 
 -- 17. Table: SUPPLIER
 CREATE TABLE SUPPLIER (
@@ -465,9 +453,7 @@ CREATE TABLE MATERIAL_USAGE (
         ON UPDATE CASCADE ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- =============================================================================
--- SUBSYSTEM 5: SUBCONTRACTORS & SITE SAFETY ASSURANCE
--- =============================================================================
+-- Subsystem 5: Subcontractors & Site Safety Assurance
 
 -- 26. Table: SUBCONTRACTOR
 CREATE TABLE SUBCONTRACTOR (
@@ -553,9 +539,7 @@ CREATE TABLE INCIDENT_REPORT (
         ON UPDATE CASCADE ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- =============================================================================
--- PERFORMANCE INDEXES (FOR FREQUENTLY FILTERED & JOINED FOREIGN KEYS)
--- =============================================================================
+-- Performance Indexes (Foreign Keys)
 CREATE INDEX IDX_EMPLOYEE_DeptID ON EMPLOYEE (DeptID);
 CREATE INDEX IDX_EMPLOYEE_SupervisorID ON EMPLOYEE (SupervisorID);
 CREATE INDEX IDX_PROJECT_ClientID ON PROJECT (ClientID);
