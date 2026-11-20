@@ -95,7 +95,7 @@ Detect user intent from context and operate in exactly one mode per turn:
 | **2. Conceptual Design (Chen EER)** | Phase 2 -> Phase 4 | Weak entity discriminators, composite/multivalued/derived attributes, total vs. partial participation, ternary/aggregation modeling |
 | **3. Logical Mapping & 3NF Proofs** | Phase 3 -> Phase 4 | Relational mapping of weak/multivalued/M:N schemas, FDs, Candidate Keys, 2NF & 3NF decompositions |
 | **4. Physical DDL & Integrity** | Phase 3 -> Phase 4 | InnoDB `utf8mb4`, `DECIMAL` precision, `CHECK` constraints, `ON UPDATE/DELETE` policies, circular FK resolution, indexes |
-| **5. Complex Triggers & Edge Cases** | Phase 3 -> Phase 4 | Cross-row/cross-table rule enforcement (`SIGNAL SQLSTATE '45000'`), `WITH RECURSIVE` DAG cycle detection, stock auto-deduction, emergency alerts |
+| **5. Complex Triggers & Edge Cases** | Phase 3 -> Phase 4 | Cross-row/cross-table rule enforcement (`SIGNAL SQLSTATE '45000'`), `WITH RECURSIVE` DAG cycle detection, stock auto-deduction |
 | **6. Queries, Reports & Relational Algebra** | Phase 3 -> Phase 4 | Multi-table JOINs, `GROUP BY`/`HAVING`, `WITH RECURSIVE` hierarchy, Cost vs. Budget & EVM (`CPI`/`SPI`), Relational Algebra trees |
 | **7. Live Demo & Cross-Doc Consistency** | Phase 4 (20% ind.) | Clean MySQL execution, realistic sample data, consistency between ERD, normalization report, and SQL scripts |
 

@@ -1,5 +1,5 @@
 -- A34Build DB (MySQL 8.0+ / InnoDB / utf8mb4) - E24-Class 5, Group 5
--- File 06: Business Rule Verification & Trigger Tests (Rules 1-8, pairs with File 02)
+-- File 06: Business Rule Verification & Trigger Tests (Rules 1-7, pairs with File 02)
 -- Usage: Run SELECT checks together; run invalid INSERT/UPDATE checks individually (expect Error 1644 / SQLSTATE 45000).
 
 USE A34Build_DB;
@@ -217,51 +217,3 @@ VALUES (
 UPDATE PROJECT
 SET DirectorEmpID = 'EMP003', Status = 'Active'
 WHERE ProjectID = 'PRJ003';
-
-
--- Rule 8: Auto-log emergency alert for Level-2..4 incidents
-SELECT 
-    l.LogID,
-    l.IncidentID,
-    l.InvolvedEmpID,
-    CONCAT(e.FirstName, ' ', e.LastName) AS InjuredEmployee,
-    l.EmergencyContactName,
-    l.Relationship,
-    l.ContactPhone,
-    l.DispatchedAt,
-    l.MessageSubject,
-    l.MessageBody,
-    l.NotificationStatus
-FROM EMERGENCY_DISPATCH_LOG l
-JOIN EMPLOYEE e ON l.InvolvedEmpID = e.EmpID
-ORDER BY l.LogID DESC;
-
-INSERT INTO INCIDENT_REPORT (
-    IncidentID, IncidentTimestamp, IncidentType, IncidentLevel,
-    DamageDescription, LostDays, Solution, SiteID, InvolvedEmpID, DamagedEquipmentID
-)
-VALUES (
-    'INC-2024-99', '2024-11-14 09:00:00', 'Equipment-Damage', 'Level-3',
-    'Test Level-3 incident for Rule 8 emergency dispatch verification',
-    5, 'Halted tower crane operation, provided medical care and safety audit',
-    'SITE01', 'EMP010', 'EQP001'
-);
-
-SELECT 
-    l.LogID,
-    l.IncidentID,
-    l.InvolvedEmpID,
-    CONCAT(e.FirstName, ' ', e.LastName) AS InjuredEmployee,
-    l.EmergencyContactName,
-    l.Relationship,
-    l.ContactPhone,
-    l.DispatchedAt,
-    l.MessageSubject,
-    l.MessageBody,
-    l.NotificationStatus
-FROM EMERGENCY_DISPATCH_LOG l
-JOIN EMPLOYEE e ON l.InvolvedEmpID = e.EmpID
-WHERE l.IncidentID IN ('INC-2024-02', 'INC-2024-99')
-ORDER BY l.LogID DESC;
-
-DELETE FROM INCIDENT_REPORT WHERE IncidentID = 'INC-2024-99';

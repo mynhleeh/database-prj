@@ -7,7 +7,6 @@ USE A34Build_DB;
 SET FOREIGN_KEY_CHECKS = 0;
 
 -- Clean existing data in reverse dependency order
-TRUNCATE TABLE EMERGENCY_DISPATCH_LOG;
 TRUNCATE TABLE INCIDENT_REPORT;
 TRUNCATE TABLE SAFETY_INSPECTION;
 TRUNCATE TABLE SUBCONTRACT;
@@ -306,7 +305,7 @@ INSERT INTO SAFETY_INSPECTION (InspectionID, InspectionDate, InspectionType, Ins
 ('INS-2024-02', '2024-09-15', 'Weekly', 'Electrical Safety and Temporary Distribution Boards', 78.00, 'Conditional-Pass', 'Sub-panel distribution box lacked rubber weatherproofing sealing', '2024-09-18', 'SITE01', 'EMP012'),
 ('INS-2024-03', '2024-10-02', 'Surprise', 'Scaffolding Tie-Backs and Marine Working Platforms', 88.00, 'Pass', 'Adequate life vests and life buoys deployed along pier foundation', NULL, 'SITE03', 'EMP012');
 
--- 5.4 Insert INCIDENT_REPORT (INC-2024-02 triggers Rule 8 emergency alert)
+-- 5.4 Insert INCIDENT_REPORT
 INSERT INTO INCIDENT_REPORT (IncidentID, IncidentTimestamp, IncidentType, IncidentLevel, DamageDescription, LostDays, Solution, SiteID, InvolvedEmpID, DamagedEquipmentID) VALUES
 ('INC-2024-01', '2024-07-12 14:30:00', 'Near-Miss', 'Level-1', 'Small wooden wedge dropped from Floor 15 into safety netting, zero casualty', 0, 'Reinforced debris catchment perimeter netting and issued warning', 'SITE01', NULL, NULL),
 ('INC-2024-02', '2024-09-22 10:15:00', 'Minor-Injury', 'Level-2', 'Operator hand sprain during heavy hook stabilization in high gust wind', 3, 'Administered first aid at clinic, mandated 3-day medical leave, tightened wind speed threshold', 'SITE01', 'EMP010', 'EQP001');

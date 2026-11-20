@@ -1,25 +1,7 @@
 -- A34Build DB (MySQL 8.0+ / InnoDB / utf8mb4) - E24-Class 5, Group 5
--- File 02: Triggers & Audit Support Table (Rules 1-8)
+-- File 02: Triggers (Rules 1-7)
 
 USE A34Build_DB;
-
--- Support table for Rule 8: Emergency Notification Audit Log
-CREATE TABLE IF NOT EXISTS EMERGENCY_DISPATCH_LOG (
-    LogID INT AUTO_INCREMENT PRIMARY KEY,
-    IncidentID VARCHAR(20) NOT NULL,
-    InvolvedEmpID VARCHAR(10) NOT NULL,
-    EmergencyContactName VARCHAR(100) NOT NULL,
-    Relationship VARCHAR(50) NOT NULL,
-    ContactPhone VARCHAR(20) NOT NULL,
-    DispatchedAt DATETIME NOT NULL,
-    MessageSubject VARCHAR(255) NOT NULL,
-    MessageBody TEXT NOT NULL,
-    NotificationStatus ENUM('Queued', 'Sent', 'Failed') NOT NULL DEFAULT 'Sent',
-    CONSTRAINT FK_DISPATCH_Incident FOREIGN KEY (IncidentID) 
-        REFERENCES INCIDENT_REPORT (IncidentID) ON DELETE CASCADE,
-    CONSTRAINT FK_DISPATCH_Emp FOREIGN KEY (InvolvedEmpID) 
-        REFERENCES EMPLOYEE (EmpID) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 DELIMITER //
 
@@ -319,62 +301,6 @@ BEGIN
         IF v_active_projects > 0 THEN
             SIGNAL SQLSTATE '45000'
             SET MESSAGE_TEXT = 'Rule 7 Violation: Site director is already managing an active project.';
-        END IF;
-    END IF;
-END //
-
--- Rule 8: Auto-log emergency alert for Level-2..4 incidents
-DROP TRIGGER IF EXISTS TRG_DISPATCH_EMERGENCY_ALERT //
-CREATE TRIGGER TRG_DISPATCH_EMERGENCY_ALERT
-AFTER INSERT ON INCIDENT_REPORT
-FOR EACH ROW
-BEGIN
-    DECLARE v_contact_name VARCHAR(100);
-    DECLARE v_relationship VARCHAR(50);
-    DECLARE v_contact_phone VARCHAR(20);
-    DECLARE v_emp_name VARCHAR(150);
-
-    IF NEW.InvolvedEmpID IS NOT NULL AND NEW.IncidentLevel IN ('Level-2', 'Level-3', 'Level-4') THEN
-        -- Get Employee Name
-        SELECT CONCAT(FirstName, ' ', LastName) INTO v_emp_name
-        FROM EMPLOYEE
-        WHERE EmpID = NEW.InvolvedEmpID;
-
-        -- Find Emergency Dependent
-        SELECT d.DependentName, d.Relationship, COALESCE(ep.PhoneNumber, 'No Phone on Record')
-        INTO v_contact_name, v_relationship, v_contact_phone
-        FROM DEPENDENT d
-        LEFT JOIN EMPLOYEE_PHONE ep ON ep.EmpID = d.EmpID
-        WHERE d.EmpID = NEW.InvolvedEmpID
-          AND d.IsEmergencyContact = TRUE
-        LIMIT 1;
-
-        -- If found, record into emergency dispatch log
-        IF v_contact_name IS NOT NULL THEN
-            INSERT INTO EMERGENCY_DISPATCH_LOG (
-                IncidentID,
-                InvolvedEmpID,
-                EmergencyContactName,
-                Relationship,
-                ContactPhone,
-                DispatchedAt,
-                MessageSubject,
-                MessageBody,
-                NotificationStatus
-            )
-            VALUES (
-                NEW.IncidentID,
-                NEW.InvolvedEmpID,
-                v_contact_name,
-                v_relationship,
-                v_contact_phone,
-                NOW(),
-                CONCAT('[URGENT] Safety Incident Notification for ', v_emp_name),
-                CONCAT('Alert: Employee ', v_emp_name, ' was involved in incident ', NEW.IncidentID,
-                       ' (Level: ', NEW.IncidentLevel, ', Type: ', NEW.IncidentType, ') at Site ', NEW.SiteID,
-                       '. Description: ', NEW.DamageDescription),
-                'Sent'
-            );
         END IF;
     END IF;
 END //

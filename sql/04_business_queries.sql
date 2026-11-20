@@ -257,21 +257,3 @@ FROM EQUIPMENT e
 LEFT JOIN MAINTENANCE_RECORD mr ON e.EquipmentID = mr.EquipmentID
 GROUP BY e.EquipmentID, e.EquipmentName, e.Category, e.HourlyRate, e.TotalRunHours
 ORDER BY LifetimeGrossRevenueGenerated DESC;
-
--- Part 3: Trigger Enforcement Verification
-
--- Verification Query 3.1: Confirm Rule 8 logged an emergency alert for INC-2024-02
-SELECT 
-    l.LogID,
-    l.IncidentID,
-    l.InvolvedEmpID,
-    CONCAT(e.FirstName, ' ', e.LastName) AS InjuredEmployee,
-    l.EmergencyContactName,
-    l.Relationship,
-    l.ContactPhone,
-    l.DispatchedAt,
-    l.MessageSubject,
-    l.MessageBody,
-    l.NotificationStatus
-FROM EMERGENCY_DISPATCH_LOG l
-JOIN EMPLOYEE e ON l.InvolvedEmpID = e.EmpID;
