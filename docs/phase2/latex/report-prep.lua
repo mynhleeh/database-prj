@@ -3,15 +3,18 @@
 local stringify = pandoc.utils.stringify
 
 local IMAGE_MAP = {
-  ["erd/merged.svg"] = "erd/merged.pdf",
-  ["schema/merged.svg"] = "schema/merged.pdf",
-  ["erd/merged.png"] = "erd/merged.pdf",
-  ["schema/merged.png"] = "schema/merged.pdf",
+  ["erd/erd.svg"] = "erd/erd.pdf",
+  ["erd/erd.png"] = "erd/erd.pdf",
+  ["schema/schema.svg"] = "schema/schema.pdf",
+  ["schema/schema.png"] = "schema/schema.pdf",
+  ["schema/schema-v2.svg"] = "schema/schema-v2.pdf",
+  ["schema/schema-v2.png"] = "schema/schema-v2.pdf",
 }
 
 local LANDSCAPE_FIGURES = {
-  ["erd/merged.pdf"] = true,
-  ["schema/merged.pdf"] = true,
+  ["erd/erd.pdf"] = true,
+  ["schema/schema.pdf"] = true,
+  ["schema/schema-v2.pdf"] = true,
 }
 
 local function normalize_src(src)

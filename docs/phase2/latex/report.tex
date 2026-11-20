@@ -1291,7 +1291,7 @@ These cross-entity and dynamic constraints cannot be expressed directly in Chen 
 
 In Chen EER notation, rectangles denote strong entity sets, double rectangles denote weak entity sets, diamonds denote regular relationships, and double diamonds denote identifying relationships. Ellipses represent attributes: underlined for primary keys, dashed-underlined for partial keys, double-lined for multi-valued attributes, and dashed-outlined for derived attributes. Double lines indicate total participation, while single lines indicate partial participation. Cardinalities are labeled \texttt{1}, \texttt{N}, \texttt{M}, and \texttt{P}. Dashed aggregation boxes enclose \texttt{EQUIPMENT\_\allowbreak{}DEPLOYMENT} and \texttt{DELIVERY\_\allowbreak{}DISPATCH} so those relationships participate directly in \texttt{OPERATES}, \texttt{FULFILLS\_\allowbreak{}PO}, and \texttt{RECEIVES\_\allowbreak{}DELIVERY}.
 
-\landscapefigure{erd/merged.pdf}{Entity-Relationship Diagram of the A34Build database, covering 17 entity sets (13 strong, 4 weak) and 30 relationships color-coded across six operational domains.}
+\landscapefigure{erd/erd.pdf}{Entity-Relationship Diagram of the A34Build database, covering 17 entity sets (13 strong, 4 weak) and 30 relationships color-coded across six operational domains.}
 
 \section{Conceptual model by domain}\label{conceptual-model-by-domain}
 
@@ -1380,7 +1380,7 @@ Each of the six color-coded ERD domains groups related entity sets, relationship
 
 Converting the Chen ERD yields 29 relation schemas under standard relational mapping rules: composite attributes (\allowbreak{}\texttt{Name}, \texttt{Address}, \texttt{LocationCoordinates}) expand into atomic scalar columns, multi-valued attributes (\allowbreak{}\texttt{ContactPhone}, \texttt{PhoneNumber}, \texttt{Certifications}, \texttt{SupplyCategories}) map to dedicated child tables keyed by owner key plus attribute value, and derived attributes (\allowbreak{}\texttt{Age}, \texttt{ProjectDuration}, \texttt{ActualCost}, \texttt{ActualHours}, \texttt{TotalRunHours}, \texttt{ItemSubtotal}, \texttt{TotalPOAmount}) are excluded from stored columns. Weak entities inherit their identifying owner's primary key combined with their partial key, while 1:1, 1:N, M:N, ternary, and aggregation relationships map via foreign keys or associative tables. In Figure 2, underlined columns form the primary key, dashed-underlined columns mark weak-entity partial keys, and arrows point from each foreign key to its referenced primary key.
 
-\landscapefigure{schema/merged.pdf}{Relational schema of the A34Build database across 29 tables and 44 foreign-key references.}
+\landscapefigure{schema/schema-v2.pdf}{Relational schema of the A34Build database across 29 tables and 44 foreign-key references.}
 
 \section{Schema definitions by domain}\label{schema-definitions-by-domain}
 

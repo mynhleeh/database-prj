@@ -534,7 +534,7 @@ These cross-entity and dynamic constraints cannot be expressed directly in Chen 
 
 ## 6.1 Diagram overview and notation
 
-![Entity-Relationship Diagram of the A34Build database](./erd/merged.png "ERD of the A34Build construction company database, color-coded by domain")
+![Entity-Relationship Diagram of the A34Build database](./erd/erd.png "ERD of the A34Build construction company database, color-coded by domain")
 
 *Figure 1: Entity-Relationship Diagram of the A34Build database, covering 17 entity sets (13 strong, 4 weak) and 30 relationships color-coded across six operational domains.*
 
@@ -573,7 +573,7 @@ Each of the six color-coded ERD domains groups related entity sets, relationship
 
 ## 7.1 Mapping rules and diagram
 
-![Relational Schema of the A34Build database](./schema/merged.png "Relational schema of the A34Build construction company database, color-coded by domain")
+![Relational Schema of the A34Build database](./schema/schema-v2.png "Relational schema of the A34Build construction company database, color-coded by domain")
 
 *Figure 2: Relational schema of the A34Build database across 29 tables and 44 foreign-key references.*
 
