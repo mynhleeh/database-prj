@@ -46,12 +46,12 @@ All 29 relational schemas mapped from the Phase 2 ERD and finalized in `sql/01_s
 
 - **27 schemas** satisfy **3NF** directly without structural modification.
 
-- **2 schemas** exhibited normal form violations from initial ERD mapping and were decomposed/corrected:
+- **2 schemas** derived from the Phase 2 EER aggregations (`EQUIPMENT_DEPLOYMENT` with `OPERATES`; `DELIVERY_DISPATCH` with `FULFILLS_PO` and `RECEIVES_DELIVERY`) exhibited normal form violations from initial ERD mapping and were refined/decomposed:
 
 | Table | Initial Defect (Phase 2) | Violation | 3NF Correction (Phase 3) |
 | :--- | :--- | :---: | :--- |
-| **16. `EQUIPMENT_DEPLOYMENT`** | $\text{SiteID}$ was in the PK: ($\underline{\text{EquipmentID}}$, $\underline{\text{SiteID}}$, $\underline{\text{DeploymentStartDate}}$), but $\{\text{EquipmentID}$, $\text{DeploymentStartDate}\}$ $\rightarrow$ $\text{SiteID}$. | **2NF** (Partial Key Dependency) | Moved $\text{SiteID}$ out of PK into a non-prime FK. Minimal PK: ($\underline{\text{EquipmentID}}$, $\underline{\text{DeploymentStartDate}}$). |
-| **24. `DELIVERY_DISPATCH`** | Contained both $\text{PO\_ID}$ and $\text{SupplierID}$, where $\text{PO\_ID}$ $\rightarrow$ $\text{SupplierID}$ via `PURCHASE_ORDER`. | **3NF** (Transitive Dependency: $\text{DeliveryCode}$ $\rightarrow$ $\text{PO\_ID}$ $\rightarrow$ $\text{SupplierID}$) | Removed $\text{SupplierID}$. Vendor is resolved losslessly via FK $\text{PO\_ID}$ $\rightarrow$ `PURCHASE_ORDER`. |
+| **16. `EQUIPMENT_DEPLOYMENT`** | Mapped from the M:N `EQUIPMENT_DEPLOYMENT` aggregation (total participation in `OPERATES`, carrying `OperatorEmpID`) with $\text{SiteID}$ in the PK: ($\underline{\text{EquipmentID}}$, $\underline{\text{SiteID}}$, $\underline{\text{DeploymentStartDate}}$), yet $\{\text{EquipmentID}$, $\text{DeploymentStartDate}\}$ $\rightarrow$ $\text{SiteID}$. | **2NF** (Partial Key Dependency) | Moved $\text{SiteID}$ out of PK into a non-prime FK. Minimal PK: ($\underline{\text{EquipmentID}}$, $\underline{\text{DeploymentStartDate}}$). |
+| **24. `DELIVERY_DISPATCH`** | Mapped from the ternary `DELIVERY_DISPATCH` aggregation (`SUPPLIER` $\times$ `MATERIAL` $\times$ `PROJECT_SITE`) plus `FULFILLS_PO` (`PO_ID`) and `RECEIVES_DELIVERY` (`ReceivedByEmpID`), causing both $\text{PO\_ID}$ and $\text{SupplierID}$ to appear while $\text{PO\_ID}$ $\rightarrow$ $\text{SupplierID}$ via `PURCHASE_ORDER`. | **3NF** (Transitive Dependency: $\text{DeliveryCode}$ $\rightarrow$ $\text{PO\_ID}$ $\rightarrow$ $\text{SupplierID}$) | Removed $\text{SupplierID}$. Vendor is resolved losslessly via FK $\text{PO\_ID}$ $\rightarrow$ `PURCHASE_ORDER`. |
 
 ## 2.2 Detailed Normalization Analysis
 
@@ -455,13 +455,15 @@ Each table is evaluated using a uniform template synchronized with `sql/01_schem
 
 **1. Phase 2 Initial Design & Conflict Analysis:**
 
+- **Conceptual Aggregation Origin:** In the Phase 2 EER model, `EQUIPMENT_DEPLOYMENT` is a binary M:N relationship (`EQUIPMENT` $\times$ `PROJECT_SITE`) wrapped as an aggregation so that `OPERATES` (`EMPLOYEE` 1:N `EQUIPMENT_DEPLOYMENT`, total on the deployment side) attaches one mandatory `OperatorEmpID` foreign key without introducing an extra associative table.
+
 - **Initial Relational Schema:** $\text{EQUIPMENT\_DEPLOYMENT}(\underline{\text{EquipmentID}}$, $\underline{\text{SiteID}}$, $\underline{\text{DeploymentStartDate}}$, $\text{DeploymentEndDate}$, $\text{OperatingHours}$, $\text{OperatorEmpID})$
 
 - **Initial Key & Functional Dependencies:**
 
   - Initial Composite Key: $\{$ $\text{EquipmentID}$, $\text{SiteID}$, $\text{DeploymentStartDate}$ $\}$.
 
-  - $FD_{16.1}:$ $\{$ $\text{EquipmentID}$, $\text{DeploymentStartDate}$ $\}$ $\rightarrow$ $\{$ $\text{SiteID}$, $\text{DeploymentEndDate}$, $\text{OperatingHours}$, $\text{OperatorEmpID}$ $\}$ (A physical machine starts deployment at most one job site on a given date).
+  - $FD_{16.1}:$ $\{$ $\text{EquipmentID}$, $\text{DeploymentStartDate}$ $\}$ $\rightarrow$ $\{$ $\text{SiteID}$, $\text{DeploymentEndDate}$, $\text{OperatingHours}$, $\text{OperatorEmpID}$ $\}$ (A physical machine starts deployment at most one job site on a given date, with one assigned primary operator).
 
 - **Conflict & 2NF Violation:**
 
@@ -675,6 +677,8 @@ Each table is evaluated using a uniform template synchronized with `sql/01_schem
 
 **1. Phase 2 Initial Design & Conflict Analysis:**
 
+- **Conceptual Aggregation Origin:** In the Phase 2 EER model, `DELIVERY_DISPATCH` is a ternary relationship (`SUPPLIER` $\times$ `MATERIAL` $\times$ `PROJECT_SITE`) keyed by `DeliveryCode` and wrapped as an aggregation to attach `FULFILLS_PO` (`PURCHASE_ORDER` 1:N `DELIVERY_DISPATCH`, total on `DELIVERY_DISPATCH`) and `RECEIVES_DELIVERY` (`EMPLOYEE` 1:N `DELIVERY_DISPATCH`, total on `DELIVERY_DISPATCH`). Direct relational mapping therefore migrated `PO_ID` and `ReceivedByEmpID` alongside the ternary participant keys `SupplierID`, `MaterialID`, and `SiteID`.
+
 - **Initial Relational Schema:** $\text{DELIVERY\_DISPATCH}(\underline{\text{DeliveryCode}}$, $\text{DeliveryDate}$, $\text{DeliveredQuantity}$, $\text{Status}$, $\text{MaterialID}$, $\text{SiteID}$, $\text{ReceivedByEmpID}$, $\text{PO\_ID}$, $\text{SupplierID})$
 
 - **Initial Key & Functional Dependencies:**
@@ -861,7 +865,7 @@ Each table is evaluated using a uniform template synchronized with `sql/01_schem
 
 The following master reference table summarizes the normalization results, candidate keys (PK and all DDL `UNIQUE` AKs), and foreign keys across all 29 normalized relations:
 
-[TODO: Export docs/phase3/schema-3nf.drawio to docs/phase3/media/schema_3nf.png and embed here]
+![Normalized 3NF Relational Schema of the A34Build database (29 tables, 42 foreign-key references)](./schema-3nf/schema-3nf.png)
 
 | No. | Relational Schema Name | Primary Key (PK) | Alternate Candidate Keys (AK) | Foreign Keys (FK) & Referencing Targets | Normal Form |
 |:--:|----|----|----|----|:--:|
@@ -968,7 +972,7 @@ ALTER TABLE DEPARTMENT
 
   - **Rule 3 (`TRG_CHECK_OPERATOR_CERT_INSERT` / `_UPDATE`):** Equipment operator must hold a valid certification matching the equipment category.
 
-[TODO: Capture Rule 3 verification screenshot by running the Rule 3 tests in sql/06_rule_verification_tests.sql]
+![Rule 3 Trigger Verification Result](./media/rule_03.png)
 
   - **Rule 4 (`TRG_CHECK_DAILY_HOURS_INSERT` / `_UPDATE`):** Worker logged hours (`HoursLogged`) cannot exceed `12.00` hours per calendar day.
 
