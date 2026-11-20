@@ -368,11 +368,11 @@ Description
 \endlastfoot
 ClientID & Primary Key & Unique client identifier \\
 ClientName & Simple & Organization or company name \\
-ClientType & Simple & Sector (\allowbreak{}Government, Commercial, Residential, Industrial) \\
-ContactPerson & Simple & Primary contact person \\
-ContactEmail & Simple & Email address \\
-ContactPhone & Multi-valued & Contact phone numbers \\
 TaxCode & Candidate Key & Business tax code \\
+RepresentativeName & Simple & Primary authorized representative \\
+Email & Candidate Key & Official contact email address \\
+Address & Composite & Composed of Street, Ward, District, City \\
+ContactPhone & Multi-valued & Contact phone numbers \\
 \end{longtable}
 }
 
@@ -395,15 +395,16 @@ Description
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-ProjectID & Primary Key & Project code (\allowbreak{}e.\allowbreak{}g., PRJ-2026-001) \\
-ProjectName & Simple & Project name \\
-StartDate & Simple & Planned start date \\
-PlannedEndDate & Simple & Contractual deadline \\
-ActualEndDate & Simple & Real completion date (\allowbreak{}null if ongoing) \\
-ProjectDuration & Derived & Elapsed days from StartDate to ActualEndDate or today \\
+ProjectID & Primary Key & Project code (\allowbreak{}e.\allowbreak{}g., PRJ001) \\
+ProjectName & Candidate Key & Unique project name \\
+ContractNumber & Candidate Key & Unique signed contract reference \\
 EstimatedBudget & Simple & Contract budget limit \\
 ActualCost & Derived & Total cost of labor, equipment, materials, and subcontracts \\
-Status & Simple & Planned, In-Progress, Suspended, Completed \\
+StartDate & Simple & Planned start date \\
+ScheduledEndDate & Simple & Contractual scheduled deadline \\
+ActualEndDate & Simple & Real completion date (\allowbreak{}null if ongoing) \\
+ProjectDuration & Derived & Elapsed days from StartDate to ActualEndDate or today \\
+Status & Simple & Planning, Active, Suspended, Completed, Cancelled \\
 \end{longtable}
 }
 
@@ -428,10 +429,8 @@ Description
 \endlastfoot
 SiteID & Primary Key & Unique site identifier \\
 SiteName & Simple & Site name or sector \\
+Address & Composite & Composed of Street, Ward, District, City \\
 LocationCoordinates & Composite & Composed of Latitude, Longitude \\
-Address & Composite & Composed of StreetAddress, District, City\_\allowbreak{}Province \\
-EnvironmentalPermit & Simple & Environmental permit number \\
-SiteStatus & Simple & Operating state (\allowbreak{}Preparation, Active, Handed\_\allowbreak{}Over) \\
 \end{longtable}
 }
 
@@ -455,14 +454,13 @@ Description
 \bottomrule\noalign{}
 \endlastfoot
 TaskID & Primary Key & Unique task identifier \\
-TaskName & Simple & Task name (\allowbreak{}Pour pile B12) \\
-EstimatedHours & Simple & Estimated work hours \\
-ActualHours & Derived & Sum of worker hours logged on this task \\
-ScheduledStartDate & Simple & Scheduled start date \\
-ScheduledEndDate & Simple & Scheduled end date \\
-ActualEndDate & Simple & Actual completion date (\allowbreak{}null if ongoing) \\
-PriorityLevel & Simple & Low, Medium, High, Urgent \\
-TaskStatus & Simple & Execution state (\allowbreak{}Pending, In\_\allowbreak{}Progress, Completed, Blocked) \\
+TaskName & Simple & Task name \\
+Description & Simple & Detailed scope and technical notes \\
+EstimatedCost & Simple & Estimated task cost \\
+ActualCost & Derived & Actual accumulated task cost \\
+StartDate & Simple & Scheduled start date \\
+EndDate & Simple & Scheduled end date \\
+Status & Simple & Execution state (\allowbreak{}Not-Started, In-Progress, Completed, Blocked) \\
 \end{longtable}
 }
 
@@ -486,12 +484,12 @@ Description
 \bottomrule\noalign{}
 \endlastfoot
 EquipmentID & Primary Key & Unique asset code \\
-Model & Simple & Make and model (\allowbreak{}CAT 320D) \\
 SerialNumber & Candidate Key & Manufacturer serial number \\
-Category & Simple & Excavator, Crane, Truck, Paver, Mixer \\
-Ownership & Simple & Owned or Rented \\
+EquipmentName & Simple & Make and equipment name \\
+Category & Simple & Equipment category (\allowbreak{}Tower Crane, Heavy Crane, Excavator, Concrete Pump, Asphalt Roller) \\
+Capacity & Simple & Rated operating capacity (\allowbreak{}e.\allowbreak{}g., 12 Tons, 2.5 m3) \\
 HourlyRate & Simple & Cost per operating hour \\
-CurrentStatus & Simple & Available, Deployed, Under-Maintenance, Retired \\
+Status & Simple & Available, Deployed, Under-Maintenance, Decommissioned \\
 TotalRunHours & Derived & Total operating hours across all jobs \\
 \end{longtable}
 }
@@ -516,12 +514,12 @@ Description
 \bottomrule\noalign{}
 \endlastfoot
 SupplierID & Primary Key & Unique vendor identifier \\
-CompanyName & Simple & Registered company name \\
+SupplierName & Simple & Registered company name \\
 TaxCode & Candidate Key & Official business tax ID \\
-ContactEmail & Simple & Sales email \\
+Email & Candidate Key & Official sales email \\
+Address & Composite & Composed of Street, Ward, District, City \\
 ContactPhone & Multi-valued & Contact phone numbers \\
-SupplyCategories & Multi-valued & Product lines (\allowbreak{}Steel, Cement, Lumber) \\
-CreditRating & Simple & Rating grade (\allowbreak{}A, B, C) \\
+SupplyCategories & Multi-valued & Product lines (\allowbreak{}Reinforcing Steel, Cement, Concrete) \\
 \end{longtable}
 }
 
@@ -545,11 +543,9 @@ Description
 \bottomrule\noalign{}
 \endlastfoot
 MaterialID & Primary Key & Unique material SKU \\
-MaterialName & Simple & Material name (\allowbreak{}Portland Cement PCB40) \\
-Category & Simple & Material classification (\allowbreak{}Steel, Cement, Aggregate, Piping, Electrical) \\
-StandardUnit & Simple & Unit of measurement (\allowbreak{}Ton, m3, Bag, Piece) \\
-UnitPrice & Simple & Reference price per unit \\
-MinStock & Simple & Minimum safety stock count \\
+MaterialName & Candidate Key & Material name (\allowbreak{}e.\allowbreak{}g., Portland Blended Cement PCB40 Bulk) \\
+Unit & Simple & Unit of measurement (\allowbreak{}Ton, m3, Bag, Piece) \\
+StandardPrice & Simple & Benchmark price per unit \\
 \end{longtable}
 }
 
@@ -574,9 +570,8 @@ Description
 \endlastfoot
 PO\_\allowbreak{}ID & Primary Key & Unique PO number \\
 OrderDate & Simple & Date order was placed \\
-ExpectedDeliveryDate & Simple & Promised arrival date \\
-DeliveryStatus & Simple & Issued, Partial\_\allowbreak{}Delivery, Fulfilled, Cancelled \\
-TotalPOAmount & Derived & Sum of line subtotals \\
+TotalAmount & Derived & Sum of line subtotals \\
+Status & Simple & Draft, Approved, Shipped, Received, Cancelled \\
 \end{longtable}
 }
 
@@ -600,13 +595,13 @@ Description
 \bottomrule\noalign{}
 \endlastfoot
 SubcontractorID & Primary Key & Unique subcontractor identifier \\
-CompanyName & Simple & Registered company name \\
+SubcontractorName & Simple & Registered company name \\
 TaxCode & Candidate Key & Official business tax ID \\
-ContactEmail & Simple & Official contact email \\
+Specialization & Simple & Specialized trade (\allowbreak{}MEP, Diaphragm Wall, Post-Tensioning) \\
+ContactPerson & Simple & Primary contact representative \\
 ContactPhone & Simple & Primary dispatch phone number \\
-TradeSpecialty & Simple & Specialized trade (\allowbreak{}Piling, Electrical, HVAC, Facade) \\
+ContactEmail & Simple & Official contact email \\
 LicenseNumber & Candidate Key & Trade license number \\
-SafetyRatingScore & Simple & Safety score (\allowbreak{}0.0 to 10.0) \\
 \end{longtable}
 }
 
@@ -631,10 +626,10 @@ Description
 \endlastfoot
 InspectionID & Primary Key & Unique inspection log ID \\
 InspectionDate & Simple & Date of inspection \\
-InspectionType & Simple & Audit type (\allowbreak{}Routine, Unannounced, Pre-Operation) \\
-InspectionScope & Simple & Inspected area or structure (\allowbreak{}e.\allowbreak{}g., Tower crane, Scaffold level 4) \\
-OverallScore & Simple & Evaluation score (\allowbreak{}0 to 100) \\
-InspectionResult & Simple & Audit conclusion (\allowbreak{}Passed, Conditional\_\allowbreak{}Pass, Failed) \\
+InspectionType & Simple & Audit type (\allowbreak{}Daily, Weekly, Monthly, Surprise, Post-Incident) \\
+InspectionScope & Simple & Inspected area or structure \\
+OverallScore & Simple & Evaluation score (\allowbreak{}0.00 to 100.00) \\
+InspectionResult & Simple & Audit conclusion (\allowbreak{}Pass, Conditional-Pass, Fail) \\
 ViolationNoted & Simple & Safety issues found \\
 FixDeadline & Simple & Deadline to fix issues (\allowbreak{}null if passed) \\
 \end{longtable}
@@ -661,8 +656,8 @@ Description
 \endlastfoot
 IncidentID & Primary Key & Unique incident case ID \\
 IncidentTimestamp & Simple & Date and time of incident \\
-IncidentType & Simple & Event category (\allowbreak{}Fall, Electrical, Equipment\_\allowbreak{}Collision, Falling\_\allowbreak{}Object) \\
-IncidentLevel & Simple & Impact classification (\allowbreak{}Warning, Minor, Serious, Fatal) \\
+IncidentType & Simple & Event category (\allowbreak{}Near-Miss, Minor-Injury, Major-Injury, Fatality, Equipment-Damage, Fire, Collapse) \\
+IncidentLevel & Simple & Impact classification (\allowbreak{}Level-1, Level-2, Level-3, Level-4) \\
 DamageDescription & Simple & Injury or equipment damage details \\
 LostDays & Simple & Work days lost due to injury \\
 Solution & Simple & Immediate remedial or preventive action taken \\
@@ -691,10 +686,9 @@ Description
 \bottomrule\noalign{}
 \endlastfoot
 DependentName & Partial Key & Full name of dependent \\
-Gender & Simple & Gender (\allowbreak{}M, F, Other) \\
-BirthDate & Simple & Date of birth \\
 Relationship & Simple & Relationship to employee (\allowbreak{}Spouse, Child, Parent) \\
-ContactPhone & Simple & Emergency contact phone number \\
+Gender & Simple & Gender (\allowbreak{}Male, Female, Other) \\
+DOB & Simple & Date of birth \\
 IsEmergencyContact & Simple & Primary emergency contact flag (\allowbreak{}true or false) \\
 \end{longtable}
 }
@@ -719,11 +713,13 @@ Description
 \bottomrule\noalign{}
 \endlastfoot
 PhaseNumber & Partial Key & Phase sequence number (\allowbreak{}1, 2, 3\ldots) \\
-PhaseTitle & Simple & Phase title (\allowbreak{}Excavation, Structure) \\
-StartDate & Simple & Scheduled start date for this phase \\
-TargetCompletionDate & Simple & Target completion date for phase \\
+PhaseName & Simple & Phase title (\allowbreak{}Excavation, Structure) \\
 PhaseBudget & Simple & Budget allocated to this phase \\
-PhaseStatus & Simple & Pending, Active, Under-Inspection, Accepted \\
+StartDate & Simple & Scheduled start date for this phase \\
+ScheduledEndDate & Simple & Target completion date for phase \\
+ActualEndDate & Simple & Real completion date (\allowbreak{}null if ongoing) \\
+Status & Simple & Pending, In-Progress, Completed, Delayed \\
+ProgressPercentage & Simple & Completion progress percentage (\allowbreak{}0.00 to 100.00) \\
 \end{longtable}
 }
 
@@ -747,9 +743,9 @@ Description
 \bottomrule\noalign{}
 \endlastfoot
 LineNumber & Partial Key & Line item number (\allowbreak{}1, 2, 3\ldots) \\
-QuantityOrdered & Simple & Quantity purchased \\
-AgreedUnitPrice & Simple & Negotiated unit price \\
-ItemSubtotal & Derived & QuantityOrdered multiplied by AgreedUnitPrice \\
+OrderQuantity & Simple & Quantity purchased \\
+UnitPrice & Simple & Negotiated unit price \\
+ItemSubtotal & Derived & OrderQuantity multiplied by UnitPrice \\
 \end{longtable}
 }
 
@@ -773,10 +769,11 @@ Description
 \bottomrule\noalign{}
 \endlastfoot
 RecordNumber & Partial Key & Service record counter \\
-ServiceDate & Simple & Date of service \\
-MaintenanceType & Simple & Service type (\allowbreak{}Oil Change, Inspection, Hydraulic Repair, Overhaul) \\
+MaintenanceDate & Simple & Date of service \\
+MaintenanceType & Simple & Service type (\allowbreak{}Routine, Preventive, Corrective, Emergency) \\
+Description & Simple & Scope of maintenance work \\
 Cost & Simple & Repair and parts cost \\
-ServiceVendor & Simple & Workshop name or external vendor \\
+PerformedBy & Simple & Workshop name or technical vendor \\
 \end{longtable}
 }
 
@@ -911,7 +908,7 @@ ServiceVendor & Simple & Workshop name or external vendor \\
 \item
   Binary M:N
 \item
-  Attributes: \texttt{AssignedDate}, \texttt{RoleOnTask}, \texttt{HoursLogged}
+  Attributes: \texttt{AssignedDate}, \texttt{RoleDescription}, \texttt{HoursLogged}
 \item
   Participation: \texttt{EMPLOYEE} is partial; \texttt{TASK} is total (\allowbreak{}every task requires at least one assigned worker).
 \end{itemize}
@@ -923,7 +920,7 @@ ServiceVendor & Simple & Workshop name or external vendor \\
 \item
   Binary M:N (\allowbreak{}modeled as an aggregation for operator assignment)
 \item
-  Attributes: \texttt{DeploymentStartDate}, \texttt{DeploymentEndDate}, \texttt{HoursOperated}
+  Attributes: \texttt{DeploymentStartDate}, \texttt{DeploymentEndDate}, \texttt{OperatingHours}
 \item
   Participation: Both \texttt{EQUIPMENT} and \texttt{PROJECT\_\allowbreak{}SITE} are partial.
 \end{itemize}
@@ -935,9 +932,9 @@ ServiceVendor & Simple & Workshop name or external vendor \\
 \item
   Binary 1:N over the \texttt{EQUIPMENT\_\allowbreak{}DEPLOYMENT} aggregation
 \item
-  Participation: Both \texttt{EMPLOYEE} and \texttt{EQUIPMENT\_\allowbreak{}DEPLOYMENT} are partial.
+  Participation: \texttt{EMPLOYEE} is partial; \texttt{EQUIPMENT\_\allowbreak{}DEPLOYMENT} is total (\allowbreak{}every equipment deployment must be assigned one certified primary operator).
 \item
-  Rule: Associates each equipment deployment with at most one primary operator (\allowbreak{}\texttt{OperatorEmpID} in the relational schema).
+  Rule: Associates each equipment deployment with exactly one primary operator (\allowbreak{}\texttt{OperatorEmpID} in the relational schema).
 \end{itemize}
 
 \subsection{\texorpdfstring{HAS\texorpdfstring{\_\allowbreak{}}{_}MAINTENANCE (EQUIPMENT to MAINTENANCE\texorpdfstring{\_\allowbreak{}}{_}RECORD)}{HASMAINTENANCE (EQUIPMENT to MAINTENANCERECORD)}}\label{has_maintenance-equipment-to-maintenance_record}
@@ -997,7 +994,7 @@ ServiceVendor & Simple & Workshop name or external vendor \\
 \item
   Binary M:N
 \item
-  Attributes: \texttt{CurrentStockQuantity}, \texttt{SafetyReorderQuantity}, \texttt{LastStocktakeDate}
+  Attributes: \texttt{CurrentStockQuantity}, \texttt{MinStock}, \texttt{ReorderQuantity}
 \item
   Participation: Both \texttt{PROJECT\_\allowbreak{}SITE} and \texttt{MATERIAL} are partial.
 \end{itemize}
@@ -1009,7 +1006,7 @@ ServiceVendor & Simple & Workshop name or external vendor \\
 \item
   Ternary M:N:P (\allowbreak{}modeled as an aggregation for purchase-order fulfillment and receiving verification)
 \item
-  Attributes: \texttt{DeliveryCode}, \texttt{DeliveryDate}, \texttt{DeliveredQuantity}
+  Attributes: \texttt{DeliveryCode}, \texttt{DeliveryDate}, \texttt{DeliveredQuantity}, \texttt{Status}
 \item
   Participation: \texttt{SUPPLIER}, \texttt{MATERIAL}, and \texttt{PROJECT\_\allowbreak{}SITE} are all partial.
 \item
@@ -1043,7 +1040,7 @@ ServiceVendor & Simple & Workshop name or external vendor \\
 \item
   Ternary N:M:P
 \item
-  Attributes: \texttt{UsageDate}, \texttt{QuantityUsed}
+  Attributes: \texttt{UsageDate}, \texttt{UsedQuantity}
 \item
   Participation: \texttt{TASK}, \texttt{MATERIAL}, and \texttt{PROJECT\_\allowbreak{}SITE} are all partial.
 \item
@@ -1057,7 +1054,7 @@ ServiceVendor & Simple & Workshop name or external vendor \\
 \item
   Binary M:N
 \item
-  Attributes: \texttt{ContractAgreementNo}, \texttt{ScopeDescription}, \texttt{ContractValue}, \texttt{WarrantyHoldRate}, \texttt{StartDate}, \texttt{CompletionDate}
+  Attributes: \texttt{ContractAgreementNo}, \texttt{ScopeOfWork}, \texttt{ContractValue}, \texttt{WarrantyHoldRate}, \texttt{StartDate}, \texttt{EndDate}
 \item
   Participation: Both \texttt{PROJECT} and \texttt{SUBCONTRACTOR} are partial.
 \end{itemize}
@@ -1137,10 +1134,9 @@ Applicable Attributes
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-Positive monetary and rate values & \textgreater{} 0 & \texttt{Salary}, \texttt{Budget}, \texttt{EstimatedBudget}, \texttt{PhaseBudget}, \texttt{ContractValue}, \texttt{UnitPrice}, \texttt{AgreedUnitPrice}, \texttt{Cost}, \texttt{HourlyRate} \\
-Positive sequence and transaction quantities & \textgreater{} 0 & \texttt{PhaseNumber}, \texttt{LineNumber}, \texttt{RecordNumber}, \texttt{QuantityOrdered}, \texttt{DeliveredQuantity}, \texttt{QuantityUsed} \\
-Non-negative stock, hours, and counts & \textgreater= 0 & \texttt{CurrentStockQuantity}, \texttt{MinStock}, \texttt{SafetyReorderQuantity}, \texttt{EstimatedHours}, \texttt{ActualHours}, \texttt{HoursLogged}, \texttt{HoursOperated}, \texttt{TotalRunHours}, \texttt{LostDays} \\
-Bounded ratings and percentages & Range check & \texttt{SafetyRatingScore} (\allowbreak{}0.0 to 10.0), \texttt{OverallScore} (\allowbreak{}0 to 100), \texttt{WarrantyHoldRate} (\allowbreak{}0.00 to 100.00) \\
+Positive salaries and transaction quantities & \textgreater{} 0 & \texttt{Salary}, \texttt{PhaseNumber}, \texttt{LineNumber}, \texttt{RecordNumber}, \texttt{OrderQuantity}, \texttt{DeliveredQuantity}, \texttt{UsedQuantity} \\
+Non-negative budgets, costs, stock, and hours & \textgreater= 0 & \texttt{Budget}, \texttt{EstimatedBudget}, \texttt{ActualCost}, \texttt{PhaseBudget}, \texttt{EstimatedCost}, \texttt{ContractValue}, \texttt{Cost}, \texttt{HourlyRate}, \texttt{StandardPrice}, \texttt{UnitPrice}, \texttt{TotalAmount}, \texttt{CurrentStockQuantity}, \texttt{MinStock}, \texttt{ReorderQuantity}, \texttt{OperatingHours}, \texttt{TotalRunHours}, \texttt{LostDays} \\
+Bounded hours and percentages & Range check & \texttt{HoursLogged} (\allowbreak{}0.00 to 24.00 per row, max 12.00 daily total), \texttt{ProgressPercentage} (\allowbreak{}0.00 to 100.00), \texttt{WarrantyHoldRate} (\allowbreak{}0.00 to 100.00), \texttt{OverallScore} (\allowbreak{}0.00 to 100.00) \\
 \end{longtable}
 }
 
@@ -1160,25 +1156,18 @@ Allowed Values
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-\texttt{CLIENT.\allowbreak{}ClientType} & \texttt{Government}, \texttt{Commercial}, \texttt{Residential}, \texttt{Industrial} \\
-\texttt{DEPENDENT.\allowbreak{}Gender} & \texttt{M}, \texttt{F}, \texttt{Other} \\
-\texttt{DEPENDENT.\allowbreak{}Relationship} & \texttt{Spouse}, \texttt{Child}, \texttt{Parent} \\
-\texttt{PROJECT.\allowbreak{}Status} & \texttt{Planned}, \texttt{In-Progress}, \texttt{Suspended}, \texttt{Completed} \\
-\texttt{PROJECT\_\allowbreak{}SITE.\allowbreak{}SiteStatus} & \texttt{Preparation}, \texttt{Active}, \texttt{Handed\_\allowbreak{}Over} \\
-\texttt{PROJECT\_\allowbreak{}PHASE.\allowbreak{}PhaseStatus} & \texttt{Pending}, \texttt{Active}, \texttt{Under-Inspection}, \texttt{Accepted} \\
-\texttt{TASK.\allowbreak{}PriorityLevel} & \texttt{Low}, \texttt{Medium}, \texttt{High}, \texttt{Urgent} \\
-\texttt{TASK.\allowbreak{}TaskStatus} & \texttt{Pending}, \texttt{In\_\allowbreak{}Progress}, \texttt{Completed}, \texttt{Blocked} \\
-\texttt{EQUIPMENT.\allowbreak{}Category} & \texttt{Excavator}, \texttt{Crane}, \texttt{Truck}, \texttt{Paver}, \texttt{Mixer} \\
-\texttt{EQUIPMENT.\allowbreak{}Ownership} & \texttt{Owned}, \texttt{Rented} \\
-\texttt{EQUIPMENT.\allowbreak{}CurrentStatus} & \texttt{Available}, \texttt{Deployed}, \texttt{Under-Maintenance}, \texttt{Retired} \\
-\texttt{MAINTENANCE\_\allowbreak{}RECORD.\allowbreak{}MaintenanceType} & \texttt{Oil Change}, \texttt{Inspection}, \texttt{Hydraulic Repair}, \texttt{Overhaul} \\
-\texttt{SUPPLIER.\allowbreak{}CreditRating} & \texttt{A}, \texttt{B}, \texttt{C} \\
-\texttt{MATERIAL.\allowbreak{}Category} & \texttt{Steel}, \texttt{Cement}, \texttt{Aggregate}, \texttt{Piping}, \texttt{Electrical} \\
-\texttt{PURCHASE\_\allowbreak{}ORDER.\allowbreak{}DeliveryStatus} & \texttt{Issued}, \texttt{Partial\_\allowbreak{}Delivery}, \texttt{Fulfilled}, \texttt{Cancelled} \\
-\texttt{SAFETY\_\allowbreak{}INSPECTION.\allowbreak{}InspectionType} & \texttt{Routine}, \texttt{Unannounced}, \texttt{Pre-Operation} \\
-\texttt{SAFETY\_\allowbreak{}INSPECTION.\allowbreak{}InspectionResult} & \texttt{Passed}, \texttt{Conditional\_\allowbreak{}Pass}, \texttt{Failed} \\
-\texttt{INCIDENT\_\allowbreak{}REPORT.\allowbreak{}IncidentType} & \texttt{Fall}, \texttt{Electrical}, \texttt{Equipment\_\allowbreak{}Collision}, \texttt{Falling\_\allowbreak{}Object} \\
-\texttt{INCIDENT\_\allowbreak{}REPORT.\allowbreak{}IncidentLevel} & \texttt{Warning}, \texttt{Minor}, \texttt{Serious}, \texttt{Fatal} \\
+\texttt{DEPENDENT.\allowbreak{}Gender} & \texttt{Male}, \texttt{Female}, \texttt{Other} \\
+\texttt{PROJECT.\allowbreak{}Status} & \texttt{Planning}, \texttt{Active}, \texttt{Suspended}, \texttt{Completed}, \texttt{Cancelled} \\
+\texttt{PROJECT\_\allowbreak{}PHASE.\allowbreak{}Status} & \texttt{Pending}, \texttt{In-Progress}, \texttt{Completed}, \texttt{Delayed} \\
+\texttt{TASK.\allowbreak{}Status} & \texttt{Not-Started}, \texttt{In-Progress}, \texttt{Completed}, \texttt{Blocked} \\
+\texttt{EQUIPMENT.\allowbreak{}Status} & \texttt{Available}, \texttt{Deployed}, \texttt{Under-Maintenance}, \texttt{Decommissioned} \\
+\texttt{MAINTENANCE\_\allowbreak{}RECORD.\allowbreak{}MaintenanceType} & \texttt{Routine}, \texttt{Preventive}, \texttt{Corrective}, \texttt{Emergency} \\
+\texttt{PURCHASE\_\allowbreak{}ORDER.\allowbreak{}Status} & \texttt{Draft}, \texttt{Approved}, \texttt{Shipped}, \texttt{Received}, \texttt{Cancelled} \\
+\texttt{DELIVERY\_\allowbreak{}DISPATCH.\allowbreak{}Status} & \texttt{In-Transit}, \texttt{Received}, \texttt{Rejected} \\
+\texttt{SAFETY\_\allowbreak{}INSPECTION.\allowbreak{}InspectionType} & \texttt{Daily}, \texttt{Weekly}, \texttt{Monthly}, \texttt{Surprise}, \texttt{Post-Incident} \\
+\texttt{SAFETY\_\allowbreak{}INSPECTION.\allowbreak{}InspectionResult} & \texttt{Pass}, \texttt{Conditional-Pass}, \texttt{Fail} \\
+\texttt{INCIDENT\_\allowbreak{}REPORT.\allowbreak{}IncidentType} & \texttt{Near-Miss}, \texttt{Minor-Injury}, \texttt{Major-Injury}, \texttt{Fatality}, \texttt{Equipment-Damage}, \texttt{Fire}, \texttt{Collapse} \\
+\texttt{INCIDENT\_\allowbreak{}REPORT.\allowbreak{}IncidentLevel} & \texttt{Level-1}, \texttt{Level-2}, \texttt{Level-3}, \texttt{Level-4} \\
 \end{longtable}
 }
 
@@ -1187,11 +1176,11 @@ Allowed Values
 \begin{itemize}
 \tightlist
 \item
-  Chronological endpoints must not precede start dates across all scheduled records: \texttt{PROJECT} (\allowbreak{}\texttt{StartDate \textless= PlannedEndDate}, \texttt{StartDate \textless= ActualEndDate}), \texttt{PROJECT\_\allowbreak{}PHASE} (\allowbreak{}\texttt{StartDate \textless= TargetCompletionDate}), \texttt{TASK} (\allowbreak{}\texttt{ScheduledStartDate \textless= ScheduledEndDate}, \texttt{ScheduledStartDate \textless= ActualEndDate}), \texttt{PURCHASE\_\allowbreak{}ORDER} (\allowbreak{}\texttt{OrderDate \textless= ExpectedDeliveryDate}), \texttt{EQUIPMENT\_\allowbreak{}DEPLOYMENT} (\allowbreak{}\texttt{DeploymentStartDate \textless= DeploymentEndDate}), \texttt{ENGAGES\_\allowbreak{}SUBCONTRACTOR} (\allowbreak{}\texttt{StartDate \textless= CompletionDate}), and \texttt{SAFETY\_\allowbreak{}INSPECTION} (\allowbreak{}\texttt{InspectionDate \textless= FixDeadline} when \texttt{FixDeadline} is non-null).
+  Chronological endpoints must not precede start dates across all scheduled records: \texttt{PROJECT} (\allowbreak{}\texttt{StartDate \textless= ScheduledEndDate}, \texttt{StartDate \textless= ActualEndDate}), \texttt{PROJECT\_\allowbreak{}PHASE} (\allowbreak{}\texttt{StartDate \textless= ScheduledEndDate}, \texttt{StartDate \textless= ActualEndDate}), \texttt{TASK} (\allowbreak{}\texttt{StartDate \textless= EndDate}), \texttt{EQUIPMENT\_\allowbreak{}DEPLOYMENT} (\allowbreak{}\texttt{DeploymentStartDate \textless= DeploymentEndDate}), \texttt{ENGAGES\_\allowbreak{}SUBCONTRACTOR} (\allowbreak{}\texttt{StartDate \textless= EndDate}), and \texttt{SAFETY\_\allowbreak{}INSPECTION} (\allowbreak{}\texttt{InspectionDate \textless= FixDeadline} when \texttt{FixDeadline} is non-null).
 \item
   Workers must be at least 18 years old at hiring and at runtime (\allowbreak{}\texttt{CurrentDate - DOB \textgreater= 18 years} and \texttt{HireDate \textgreater= DOB + 18 years}).
 \item
-  Task \texttt{ScheduledStartDate} and \texttt{ScheduledEndDate} values must fall within the parent \texttt{PROJECT\_\allowbreak{}PHASE} interval (\allowbreak{}\texttt{StartDate} to \texttt{TargetCompletionDate}).
+  Task \texttt{StartDate} and \texttt{EndDate} values must fall within the parent \texttt{PROJECT\_\allowbreak{}PHASE} interval (\allowbreak{}\texttt{StartDate} to \texttt{ScheduledEndDate}).
 \end{itemize}
 
 \section{Rules not modeled in ERD}\label{rules-not-modeled-in-erd}
@@ -1212,11 +1201,9 @@ These cross-entity and dynamic constraints cannot be expressed directly in Chen 
 \item
   No circular task dependencies: The recursive \texttt{PRECEDES} graph over \texttt{TASK} must remain a directed acyclic graph (\allowbreak{}DAG) with no self-loops or cycles.
 \item
-  Stock limit on consumption: \texttt{MATERIAL\_\allowbreak{}USAGE.\allowbreak{}QuantityUsed} for a given \texttt{(\allowbreak{}\allowbreak{}MaterialID, SiteID)} cannot exceed \texttt{SITE\_\allowbreak{}INVENTORY.\allowbreak{}CurrentStockQuantity} at that site.
+  Stock limit on consumption: \texttt{MATERIAL\_\allowbreak{}USAGE.\allowbreak{}UsedQuantity} for a given \texttt{(\allowbreak{}\allowbreak{}MaterialID, SiteID)} cannot exceed \texttt{SITE\_\allowbreak{}INVENTORY.\allowbreak{}CurrentStockQuantity} at that site.
 \item
-  Single active project limit for directors: Although \texttt{DIRECTS\_\allowbreak{}PROJECT} is modeled as 1:1 in the conceptual schema, historical project records require enforcing that an employee directs at most one \texttt{In-Progress} project at any given time.
-\item
-  Accident emergency notification: When \texttt{INCIDENT\_\allowbreak{}REPORT} references an injured employee via \texttt{INVOLVES\_\allowbreak{}EMPLOYEE}, the system must query \texttt{DEPENDENT} where \texttt{IsEmergencyContact = true} to notify the designated emergency contact.
+  Single active project limit for directors: Although \texttt{DIRECTS\_\allowbreak{}PROJECT} is modeled as 1:1 in the conceptual schema, historical project records require enforcing that an employee directs at most one \texttt{Active} project at any given time.
 \end{enumerate}
 
 \chapter{Database applications}\label{database-applications}
@@ -1226,13 +1213,13 @@ These cross-entity and dynamic constraints cannot be expressed directly in Chen 
 \begin{itemize}
 \tightlist
 \item
-  Import the standard \texttt{MATERIAL} catalog with \texttt{StandardUnit} and benchmark \texttt{UnitPrice}.
+  Import the standard \texttt{MATERIAL} catalog with \texttt{Unit} and benchmark \texttt{StandardPrice}.
 \item
   Register \texttt{EMPLOYEE} records with \texttt{JobTitle}, assigned \texttt{DEPARTMENT}, and verified \texttt{Certifications}.
 \item
   Initialize \texttt{PROJECT} contracts, \texttt{PROJECT\_\allowbreak{}SITE} coordinates, and \texttt{PROJECT\_\allowbreak{}PHASE} milestone schedules.
 \item
-  Register owned or rented \texttt{EQUIPMENT} assets with unique \texttt{SerialNumber} values.
+  Register heavy \texttt{EQUIPMENT} assets with unique \texttt{SerialNumber}, \texttt{Category}, \texttt{Capacity}, and \texttt{HourlyRate} values.
 \end{itemize}
 
 \section{Updates}\label{updates}
@@ -1240,15 +1227,15 @@ These cross-entity and dynamic constraints cannot be expressed directly in Chen 
 \begin{itemize}
 \tightlist
 \item
-  Log worker \texttt{HoursLogged} and \texttt{RoleOnTask} on assigned \texttt{TASK} records.
+  Log worker \texttt{HoursLogged} and \texttt{RoleDescription} on assigned \texttt{TASK} records.
 \item
   Record \texttt{DELIVERY\_\allowbreak{}DISPATCH} arrivals against \texttt{PURCHASE\_\allowbreak{}ORDER} items and increment \texttt{SITE\_\allowbreak{}INVENTORY.\allowbreak{}CurrentStockQuantity}.
 \item
   Record \texttt{MATERIAL\_\allowbreak{}USAGE} quantities during task execution and deduct from on-site \texttt{CurrentStockQuantity}.
 \item
-  Accumulate \texttt{EQUIPMENT\_\allowbreak{}DEPLOYMENT.\allowbreak{}HoursOperated}, update \texttt{TotalRunHours}, and transition \texttt{CurrentStatus} to \texttt{Under-Maintenance} when service intervals arrive.
+  Accumulate \texttt{EQUIPMENT\_\allowbreak{}DEPLOYMENT.\allowbreak{}OperatingHours}, update \texttt{TotalRunHours}, and transition \texttt{EQUIPMENT.\allowbreak{}Status} to \texttt{Under-Maintenance} when service intervals arrive.
 \item
-  Transition \texttt{PROJECT\_\allowbreak{}PHASE.\allowbreak{}PhaseStatus} to \texttt{Accepted} after milestone sign-off.
+  Transition \texttt{PROJECT\_\allowbreak{}PHASE.\allowbreak{}Status} to \texttt{Completed} and update \texttt{ProgressPercentage} after milestone sign-off.
 \item
   Record \texttt{SAFETY\_\allowbreak{}INSPECTION} scores, remediation deadlines, and \texttt{INCIDENT\_\allowbreak{}REPORT} cases.
 \end{itemize}
@@ -1260,13 +1247,13 @@ These cross-entity and dynamic constraints cannot be expressed directly in Chen 
 \item
   Retrieve \texttt{Available} equipment by \texttt{Category} with no scheduled \texttt{EQUIPMENT\_\allowbreak{}DEPLOYMENT} overlap in the next two weeks.
 \item
-  Identify \texttt{SITE\_\allowbreak{}INVENTORY} items at a site where \texttt{CurrentStockQuantity} has fallen below \texttt{MATERIAL.\allowbreak{}MinStock} or \texttt{SafetyReorderQuantity}.
+  Identify \texttt{SITE\_\allowbreak{}INVENTORY} items at a site where \texttt{CurrentStockQuantity} has fallen below \texttt{MinStock} or \texttt{ReorderQuantity}.
 \item
-  List \texttt{Urgent} tasks whose \texttt{TaskStatus} is not \texttt{Completed} past \texttt{ScheduledEndDate}.
+  List tasks whose \texttt{Status} is not \texttt{Completed} past \texttt{EndDate}.
 \item
   Traverse the recursive \texttt{SUPERVISES} chain from any \texttt{EMPLOYEE} up to the general director.
 \item
-  Retrieve active subcontractors on a project with \texttt{ContractValue}, \texttt{SafetyRatingScore}, and retained \texttt{WarrantyHoldRate} amounts.
+  Retrieve active subcontractors on a project with \texttt{ContractValue} and retained \texttt{WarrantyHoldRate} amounts.
 \end{itemize}
 
 \section{Reports}\label{reports}
@@ -1274,15 +1261,15 @@ These cross-entity and dynamic constraints cannot be expressed directly in Chen 
 \begin{itemize}
 \tightlist
 \item
-  Cost vs.~budget variance: Compares \texttt{PROJECT.\allowbreak{}EstimatedBudget} against aggregated spending across labor, equipment deployments, material purchases, and subcontracts (\allowbreak{}\texttt{ActualCost}).
+  Cost vs.~budget variance: Compares \texttt{PROJECT.\allowbreak{}EstimatedBudget} against aggregated spending across labor, equipment deployments, material consumption, and subcontracts (\allowbreak{}\texttt{ActualCost}).
 \item
   Earned value analysis: Computes Planned Value (\allowbreak{}PV), Earned Value (\allowbreak{}EV), Actual Cost (\allowbreak{}AC), Cost Performance Index (\allowbreak{}CPI), and Schedule Performance Index (\allowbreak{}SPI).
 \item
   Site safety report: Summarizes \texttt{SAFETY\_\allowbreak{}INSPECTION.\allowbreak{}OverallScore}, unresolved violations, \texttt{INCIDENT\_\allowbreak{}REPORT.\allowbreak{}LostDays}, and injury-free hours per site.
 \item
-  Subcontractor scorecard: Ranks subcontractors by schedule adherence, inspection quality, and \texttt{SafetyRatingScore}.
+  Subcontractor scorecard: Ranks subcontractors by schedule adherence, contract scope delivery, and site inspection outcomes.
 \item
-  Fleet utilization report: Compares \texttt{TotalRunHours} and \texttt{HoursOperated} against idle time and \texttt{HourlyRate} cost recovery.
+  Fleet utilization report: Compares \texttt{TotalRunHours} and \texttt{OperatingHours} against maintenance cost and \texttt{HourlyRate} revenue generation.
 \end{itemize}
 
 \chapter{Entity-Relationship Diagram}\label{entity-relationship-diagram}
@@ -1320,9 +1307,9 @@ Each of the six color-coded ERD domains groups related entity sets, relationship
   \item
     Entity sets: Strong entities \texttt{CLIENT} (\allowbreak{}key: \texttt{ClientID}), \texttt{PROJECT} (\allowbreak{}key: \texttt{ProjectID}), \texttt{PROJECT\_\allowbreak{}SITE} (\allowbreak{}key: \texttt{SiteID}), and \texttt{TASK} (\allowbreak{}key: \texttt{TaskID}), plus weak entity \texttt{PROJECT\_\allowbreak{}PHASE} (\allowbreak{}identifying owner: \texttt{PROJECT}; partial key: \texttt{PhaseNumber}).
   \item
-    Relationships: \texttt{COMMISSIONS} (\allowbreak{}1:N, partial \texttt{CLIENT}, total \texttt{PROJECT}), \texttt{DEPARTMENT\_\allowbreak{}SPONSORS\_\allowbreak{}PROJECT} (\allowbreak{}1:N, partial \texttt{DEPARTMENT}, total \texttt{PROJECT}), \texttt{DIRECTS\_\allowbreak{}PROJECT} (\allowbreak{}1:1, partial \texttt{EMPLOYEE}, total \texttt{PROJECT}), \texttt{HAS\_\allowbreak{}SITES} (\allowbreak{}1:N, total on both), \texttt{CONSISTS\_\allowbreak{}OF\_\allowbreak{}PHASES} (\allowbreak{}identifying 1:N, total on both), \texttt{CONTAINS\_\allowbreak{}TASKS} (\allowbreak{}1:N, total on both), \texttt{PRECEDES} (\allowbreak{}recursive M:N on \texttt{TASK}, partial on both), and \texttt{WORKS\_\allowbreak{}ON\_\allowbreak{}TASK} (\allowbreak{}M:N, partial \texttt{EMPLOYEE}, total \texttt{TASK}, with \texttt{AssignedDate}, \texttt{RoleOnTask}, \texttt{HoursLogged}).
+    Relationships: \texttt{COMMISSIONS} (\allowbreak{}1:N, partial \texttt{CLIENT}, total \texttt{PROJECT}), \texttt{DEPARTMENT\_\allowbreak{}SPONSORS\_\allowbreak{}PROJECT} (\allowbreak{}1:N, partial \texttt{DEPARTMENT}, total \texttt{PROJECT}), \texttt{DIRECTS\_\allowbreak{}PROJECT} (\allowbreak{}1:1, partial \texttt{EMPLOYEE}, total \texttt{PROJECT}), \texttt{HAS\_\allowbreak{}SITES} (\allowbreak{}1:N, total on both), \texttt{CONSISTS\_\allowbreak{}OF\_\allowbreak{}PHASES} (\allowbreak{}identifying 1:N, total on both), \texttt{CONTAINS\_\allowbreak{}TASKS} (\allowbreak{}1:N, total on both), \texttt{PRECEDES} (\allowbreak{}recursive M:N on \texttt{TASK}, partial on both), and \texttt{WORKS\_\allowbreak{}ON\_\allowbreak{}TASK} (\allowbreak{}M:N, partial \texttt{EMPLOYEE}, total \texttt{TASK}, with \texttt{AssignedDate}, \texttt{RoleDescription}, \texttt{HoursLogged}).
   \item
-    Attribute classifications: \texttt{CLIENT.\allowbreak{}TaxCode} is a candidate key and \texttt{ContactPhone} is multi-valued; \texttt{PROJECT\_\allowbreak{}SITE} has composite \texttt{LocationCoordinates} (\allowbreak{}\texttt{Latitude}, \texttt{Longitude}) and composite \texttt{Address} (\allowbreak{}\texttt{StreetAddress}, \texttt{District}, \texttt{City\_\allowbreak{}Province}); \texttt{PROJECT.\allowbreak{}ProjectDuration}, \texttt{PROJECT.\allowbreak{}ActualCost}, and \texttt{TASK.\allowbreak{}ActualHours} are derived.
+    Attribute classifications: \texttt{CLIENT.\allowbreak{}TaxCode} and \texttt{CLIENT.\allowbreak{}Email} are candidate keys, \texttt{CLIENT.\allowbreak{}Address} (\allowbreak{}\texttt{Street}, \texttt{Ward}, \texttt{District}, \texttt{City}) is composite, and \texttt{ContactPhone} is multi-valued; \texttt{PROJECT.\allowbreak{}ProjectName} and \texttt{PROJECT.\allowbreak{}ContractNumber} are candidate keys; \texttt{PROJECT\_\allowbreak{}SITE} has composite \texttt{LocationCoordinates} (\allowbreak{}\texttt{Latitude}, \texttt{Longitude}) and composite \texttt{Address} (\allowbreak{}\texttt{Street}, \texttt{Ward}, \texttt{District}, \texttt{City}); \texttt{PROJECT.\allowbreak{}ProjectDuration}, \texttt{PROJECT.\allowbreak{}ActualCost}, and \texttt{TASK.\allowbreak{}ActualCost} are derived.
   \end{itemize}
 \item
   Equipment (\allowbreak{}orange)
@@ -1332,7 +1319,7 @@ Each of the six color-coded ERD domains groups related entity sets, relationship
   \item
     Entity sets: Strong entity \texttt{EQUIPMENT} (\allowbreak{}key: \texttt{EquipmentID}) and weak entity \texttt{MAINTENANCE\_\allowbreak{}RECORD} (\allowbreak{}identifying owner: \texttt{EQUIPMENT}; partial key: \texttt{RecordNumber}).
   \item
-    Relationships: \texttt{HAS\_\allowbreak{}MAINTENANCE} (\allowbreak{}identifying 1:N, partial \texttt{EQUIPMENT}, total \texttt{MAINTENANCE\_\allowbreak{}RECORD}), \texttt{EQUIPMENT\_\allowbreak{}DEPLOYMENT} (\allowbreak{}M:N between \texttt{EQUIPMENT} and \texttt{PROJECT\_\allowbreak{}SITE}, partial on both, with \texttt{DeploymentStartDate}, \texttt{DeploymentEndDate}, \texttt{HoursOperated}), and \texttt{OPERATES} (\allowbreak{}1:N between \texttt{EMPLOYEE} and the \texttt{EQUIPMENT\_\allowbreak{}DEPLOYMENT} aggregation, partial on both).
+    Relationships: \texttt{HAS\_\allowbreak{}MAINTENANCE} (\allowbreak{}identifying 1:N, partial \texttt{EQUIPMENT}, total \texttt{MAINTENANCE\_\allowbreak{}RECORD}), \texttt{EQUIPMENT\_\allowbreak{}DEPLOYMENT} (\allowbreak{}M:N between \texttt{EQUIPMENT} and \texttt{PROJECT\_\allowbreak{}SITE}, partial on both, with \texttt{DeploymentStartDate}, \texttt{DeploymentEndDate}, \texttt{OperatingHours}), and \texttt{OPERATES} (\allowbreak{}1:N between \texttt{EMPLOYEE} and the \texttt{EQUIPMENT\_\allowbreak{}DEPLOYMENT} aggregation, partial \texttt{EMPLOYEE}, total \texttt{EQUIPMENT\_\allowbreak{}DEPLOYMENT}).
   \item
     Attribute classifications: \texttt{EQUIPMENT.\allowbreak{}SerialNumber} is a candidate key; \texttt{TotalRunHours} is derived; \texttt{EQUIPMENT\_\allowbreak{}DEPLOYMENT} acts as an aggregation so operator assignment attaches directly via \texttt{OPERATES}.
   \end{itemize}
@@ -1344,9 +1331,9 @@ Each of the six color-coded ERD domains groups related entity sets, relationship
   \item
     Entity sets: Strong entities \texttt{SUPPLIER} (\allowbreak{}key: \texttt{SupplierID}), \texttt{PURCHASE\_\allowbreak{}ORDER} (\allowbreak{}key: \texttt{PO\_\allowbreak{}ID}), and \texttt{MATERIAL} (\allowbreak{}key: \texttt{MaterialID}), plus weak entity \texttt{PO\_\allowbreak{}ITEM} (\allowbreak{}identifying owner: \texttt{PURCHASE\_\allowbreak{}ORDER}; partial key: \texttt{LineNumber}).
   \item
-    Relationships: \texttt{ISSUES\_\allowbreak{}PO} (\allowbreak{}\texttt{PROJECT} 1:N \texttt{PURCHASE\_\allowbreak{}ORDER}, partial \texttt{PROJECT}, total \texttt{PURCHASE\_\allowbreak{}ORDER}), \texttt{SUPPLIES\_\allowbreak{}PO} (\allowbreak{}\texttt{SUPPLIER} 1:N \texttt{PURCHASE\_\allowbreak{}ORDER}, partial \texttt{SUPPLIER}, total \texttt{PURCHASE\_\allowbreak{}ORDER}), \texttt{CONTAINS\_\allowbreak{}ITEM} (\allowbreak{}identifying 1:N, total on both), \texttt{ITEM\_\allowbreak{}REFERENCES\_\allowbreak{}MATERIAL} (\allowbreak{}\texttt{PO\_\allowbreak{}ITEM} N:1 \texttt{MATERIAL}, total \texttt{PO\_\allowbreak{}ITEM}, partial \texttt{MATERIAL}), \texttt{SITE\_\allowbreak{}INVENTORY} (\allowbreak{}\texttt{PROJECT\_\allowbreak{}SITE} M:N \texttt{MATERIAL}, partial on both, with \texttt{CurrentStockQuantity}, \texttt{SafetyReorderQuantity}, \texttt{LastStocktakeDate}), ternary \texttt{DELIVERY\_\allowbreak{}DISPATCH} (\allowbreak{}\texttt{SUPPLIER} x \texttt{MATERIAL} x \texttt{PROJECT\_\allowbreak{}SITE}, all partial, with \texttt{DeliveryCode}, \texttt{DeliveryDate}, \texttt{DeliveredQuantity}), \texttt{FULFILLS\_\allowbreak{}PO} (\allowbreak{}\texttt{PURCHASE\_\allowbreak{}ORDER} 1:N over \texttt{DELIVERY\_\allowbreak{}DISPATCH} aggregation, partial \texttt{PURCHASE\_\allowbreak{}ORDER}, total \texttt{DELIVERY\_\allowbreak{}DISPATCH}), \texttt{RECEIVES\_\allowbreak{}DELIVERY} (\allowbreak{}\texttt{EMPLOYEE} 1:N over \texttt{DELIVERY\_\allowbreak{}DISPATCH} aggregation, partial \texttt{EMPLOYEE}, total \texttt{DELIVERY\_\allowbreak{}DISPATCH}), and ternary \texttt{MATERIAL\_\allowbreak{}USAGE} (\allowbreak{}\texttt{TASK} x \texttt{MATERIAL} x \texttt{PROJECT\_\allowbreak{}SITE}, all partial, with \texttt{UsageDate}, \texttt{QuantityUsed}).
+    Relationships: \texttt{ISSUES\_\allowbreak{}PO} (\allowbreak{}\texttt{PROJECT} 1:N \texttt{PURCHASE\_\allowbreak{}ORDER}, partial \texttt{PROJECT}, total \texttt{PURCHASE\_\allowbreak{}ORDER}), \texttt{SUPPLIES\_\allowbreak{}PO} (\allowbreak{}\texttt{SUPPLIER} 1:N \texttt{PURCHASE\_\allowbreak{}ORDER}, partial \texttt{SUPPLIER}, total \texttt{PURCHASE\_\allowbreak{}ORDER}), \texttt{CONTAINS\_\allowbreak{}ITEM} (\allowbreak{}identifying 1:N, total on both), \texttt{ITEM\_\allowbreak{}REFERENCES\_\allowbreak{}MATERIAL} (\allowbreak{}\texttt{PO\_\allowbreak{}ITEM} N:1 \texttt{MATERIAL}, total \texttt{PO\_\allowbreak{}ITEM}, partial \texttt{MATERIAL}), \texttt{SITE\_\allowbreak{}INVENTORY} (\allowbreak{}\texttt{PROJECT\_\allowbreak{}SITE} M:N \texttt{MATERIAL}, partial on both, with \texttt{CurrentStockQuantity}, \texttt{MinStock}, \texttt{ReorderQuantity}), ternary \texttt{DELIVERY\_\allowbreak{}DISPATCH} (\allowbreak{}\texttt{SUPPLIER} x \texttt{MATERIAL} x \texttt{PROJECT\_\allowbreak{}SITE}, all partial, with \texttt{DeliveryCode}, \texttt{DeliveryDate}, \texttt{DeliveredQuantity}, \texttt{Status}), \texttt{FULFILLS\_\allowbreak{}PO} (\allowbreak{}\texttt{PURCHASE\_\allowbreak{}ORDER} 1:N over \texttt{DELIVERY\_\allowbreak{}DISPATCH} aggregation, partial \texttt{PURCHASE\_\allowbreak{}ORDER}, total \texttt{DELIVERY\_\allowbreak{}DISPATCH}), \texttt{RECEIVES\_\allowbreak{}DELIVERY} (\allowbreak{}\texttt{EMPLOYEE} 1:N over \texttt{DELIVERY\_\allowbreak{}DISPATCH} aggregation, partial \texttt{EMPLOYEE}, total \texttt{DELIVERY\_\allowbreak{}DISPATCH}), and ternary \texttt{MATERIAL\_\allowbreak{}USAGE} (\allowbreak{}\texttt{TASK} x \texttt{MATERIAL} x \texttt{PROJECT\_\allowbreak{}SITE}, all partial, with \texttt{UsageDate}, \texttt{UsedQuantity}).
   \item
-    Attribute classifications: \texttt{SUPPLIER.\allowbreak{}TaxCode} is a candidate key, while \texttt{ContactPhone} and \texttt{SupplyCategories} are multi-valued; \texttt{PO\_\allowbreak{}ITEM.\allowbreak{}ItemSubtotal} and \texttt{PURCHASE\_\allowbreak{}ORDER.\allowbreak{}TotalPOAmount} are derived; \texttt{DELIVERY\_\allowbreak{}DISPATCH} is wrapped as an aggregation to attach purchase-order fulfillment and receiving verification.
+    Attribute classifications: \texttt{SUPPLIER.\allowbreak{}TaxCode} and \texttt{SUPPLIER.\allowbreak{}Email} are candidate keys, \texttt{SUPPLIER.\allowbreak{}Address} (\allowbreak{}\texttt{Street}, \texttt{Ward}, \texttt{District}, \texttt{City}) is composite, while \texttt{ContactPhone} and \texttt{SupplyCategories} are multi-valued; \texttt{MATERIAL.\allowbreak{}MaterialName} is a candidate key; \texttt{PO\_\allowbreak{}ITEM.\allowbreak{}ItemSubtotal} and \texttt{PURCHASE\_\allowbreak{}ORDER.\allowbreak{}TotalAmount} are derived; \texttt{DELIVERY\_\allowbreak{}DISPATCH} is wrapped as an aggregation to attach purchase-order fulfillment and receiving verification.
   \end{itemize}
 \item
   Subcontractors (\allowbreak{}yellow)
@@ -1356,7 +1343,7 @@ Each of the six color-coded ERD domains groups related entity sets, relationship
   \item
     Entity sets: Strong entity \texttt{SUBCONTRACTOR} (\allowbreak{}key: \texttt{SubcontractorID}), connected across domains to \texttt{PROJECT}.
   \item
-    Relationships: \texttt{ENGAGES\_\allowbreak{}SUBCONTRACTOR} (\allowbreak{}M:N between \texttt{PROJECT} and \texttt{SUBCONTRACTOR}, partial on both, carrying \texttt{ContractAgreementNo}, \texttt{ScopeDescription}, \texttt{ContractValue}, \texttt{WarrantyHoldRate}, \texttt{StartDate}, and \texttt{CompletionDate}).
+    Relationships: \texttt{ENGAGES\_\allowbreak{}SUBCONTRACTOR} (\allowbreak{}M:N between \texttt{PROJECT} and \texttt{SUBCONTRACTOR}, partial on both, carrying \texttt{ContractAgreementNo}, \texttt{ScopeOfWork}, \texttt{ContractValue}, \texttt{WarrantyHoldRate}, \texttt{StartDate}, and \texttt{EndDate}).
   \item
     Attribute classifications: \texttt{SUBCONTRACTOR.\allowbreak{}TaxCode} and \texttt{SUBCONTRACTOR.\allowbreak{}LicenseNumber} are candidate keys; \texttt{ContractAgreementNo} uniquely identifies each engagement contract across projects.
   \end{itemize}
@@ -1378,9 +1365,9 @@ Each of the six color-coded ERD domains groups related entity sets, relationship
 
 \section{Mapping rules and diagram}\label{mapping-rules-and-diagram}
 
-Converting the Chen ERD yields 29 relation schemas under standard relational mapping rules: composite attributes (\allowbreak{}\texttt{Name}, \texttt{Address}, \texttt{LocationCoordinates}) expand into atomic scalar columns, multi-valued attributes (\allowbreak{}\texttt{ContactPhone}, \texttt{PhoneNumber}, \texttt{Certifications}, \texttt{SupplyCategories}) map to dedicated child tables keyed by owner key plus attribute value, and derived attributes (\allowbreak{}\texttt{Age}, \texttt{ProjectDuration}, \texttt{ActualCost}, \texttt{ActualHours}, \texttt{TotalRunHours}, \texttt{ItemSubtotal}, \texttt{TotalPOAmount}) are excluded from stored columns. Weak entities inherit their identifying owner's primary key combined with their partial key, while 1:1, 1:N, M:N, ternary, and aggregation relationships map via foreign keys or associative tables. In Figure 2, underlined columns form the primary key, dashed-underlined columns mark weak-entity partial keys, and arrows point from each foreign key to its referenced primary key.
+Converting the Chen ERD yields 29 relation schemas under standard relational mapping rules: composite attributes (\allowbreak{}\texttt{Name}, \texttt{Address}, \texttt{LocationCoordinates}) expand into atomic scalar columns, multi-valued attributes (\allowbreak{}\texttt{ContactPhone}, \texttt{PhoneNumber}, \texttt{Certifications}, \texttt{SupplyCategories}) map to dedicated child tables keyed by owner key plus attribute value, and purely derived attributes (\allowbreak{}\texttt{Age}, \texttt{ProjectDuration}, \texttt{ItemSubtotal}) are excluded from stored columns, while materialized ledger totals (\allowbreak{}\texttt{PROJECT.\allowbreak{}ActualCost}, \texttt{TASK.\allowbreak{}ActualCost}, \texttt{EQUIPMENT.\allowbreak{}TotalRunHours}, \texttt{PURCHASE\_\allowbreak{}ORDER.\allowbreak{}TotalAmount}) are retained as cached numeric columns for reporting. Weak entities inherit their identifying owner's primary key combined with their partial key, while 1:1, 1:N, M:N, ternary, and aggregation relationships map via foreign keys or associative tables. In Figure 2, underlined columns form the primary key, dashed-underlined columns mark weak-entity partial keys, and arrows point from each foreign key to its referenced primary key.
 
-\landscapefigure{schema/schema-v2.pdf}{Relational schema of the A34Build database across 29 tables and 44 foreign-key references.}
+\landscapefigure{schema/schema.pdf}{Relational schema of the A34Build database across 29 tables and 44 foreign-key references.}
 
 \section{Schema definitions by domain}\label{schema-definitions-by-domain}
 
@@ -1412,13 +1399,13 @@ DEPARTMENT & \texttt{DeptID} & \texttt{DeptID}, \texttt{DeptName}, \texttt{Offic
 EMPLOYEE & \texttt{EmpID} & \texttt{EmpID}, \texttt{FirstName}, \texttt{MiddleName}, \texttt{LastName}, \texttt{Street}, \texttt{Ward}, \texttt{District}, \texttt{City}, \texttt{DOB}, \texttt{HireDate}, \texttt{Salary}, \texttt{JobTitle}, \texttt{Email}, \texttt{DeptID}, \texttt{SupervisorID} & \texttt{DeptID -\textgreater{} DEPARTMENT(\allowbreak{}\allowbreak{}DeptID)}; \texttt{SupervisorID -\textgreater{} EMPLOYEE(\allowbreak{}\allowbreak{}EmpID)} \\
 EMPLOYEE\_\allowbreak{}PHONE & \texttt{EmpID}, \texttt{PhoneNumber} & \texttt{EmpID}, \texttt{PhoneNumber} & \texttt{EmpID -\textgreater{} EMPLOYEE(\allowbreak{}\allowbreak{}EmpID)} \\
 EMPLOYEE\_\allowbreak{}CERTIFICATION & \texttt{EmpID}, \texttt{Certification} & \texttt{EmpID}, \texttt{Certification} & \texttt{EmpID -\textgreater{} EMPLOYEE(\allowbreak{}\allowbreak{}EmpID)} \\
-DEPENDENT & \texttt{EmpID}, \texttt{DependentName} (\allowbreak{}partial key) & \texttt{EmpID}, \texttt{DependentName}, \texttt{Gender}, \texttt{BirthDate}, \texttt{Relationship}, \texttt{ContactPhone}, \texttt{IsEmergencyContact} & \texttt{EmpID -\textgreater{} EMPLOYEE(\allowbreak{}\allowbreak{}EmpID)} \\
+DEPENDENT & \texttt{EmpID}, \texttt{DependentName} (\allowbreak{}partial key) & \texttt{EmpID}, \texttt{DependentName}, \texttt{Relationship}, \texttt{Gender}, \texttt{DOB}, \texttt{IsEmergencyContact} & \texttt{EmpID -\textgreater{} EMPLOYEE(\allowbreak{}\allowbreak{}EmpID)} \\
 \end{longtable}
 }
 
 \subsection{Projects}\label{projects}
 
-\texttt{CLIENT.\allowbreak{}ContactPhone} extracts into \texttt{CLIENT\_\allowbreak{}PHONE}, \texttt{PROJECT\_\allowbreak{}SITE} expands composite \texttt{LocationCoordinates} and \texttt{Address} into atomic columns, derived attributes (\allowbreak{}\texttt{ProjectDuration}, \texttt{ActualCost}, \texttt{ActualHours}) are omitted, and \texttt{TASK} references \texttt{PROJECT\_\allowbreak{}PHASE} through the composite foreign key \texttt{(\allowbreak{}\allowbreak{}ProjectID, PhaseNumber)}.
+\texttt{CLIENT.\allowbreak{}ContactPhone} extracts into \texttt{CLIENT\_\allowbreak{}PHONE}, \texttt{CLIENT} and \texttt{PROJECT\_\allowbreak{}SITE} expand composite \texttt{Address} and \texttt{LocationCoordinates} into atomic columns, \texttt{ProjectDuration} is omitted as derived while \texttt{PROJECT.\allowbreak{}ActualCost} and \texttt{TASK.\allowbreak{}ActualCost} are retained as materialized totals, and \texttt{TASK} references \texttt{PROJECT\_\allowbreak{}PHASE} through the composite foreign key \texttt{(\allowbreak{}\allowbreak{}ProjectID, PhaseNumber)}.
 
 {\def\LTcaptype{none} % do not increment counter
 \begin{longtable}[]{@{}
@@ -1440,20 +1427,20 @@ Foreign Keys
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-CLIENT & \texttt{ClientID} & \texttt{ClientID}, \texttt{ClientName}, \texttt{ClientType}, \texttt{ContactPerson}, \texttt{ContactEmail}, \texttt{TaxCode} & \emph{None} \\
+CLIENT & \texttt{ClientID} & \texttt{ClientID}, \texttt{ClientName}, \texttt{TaxCode}, \texttt{RepresentativeName}, \texttt{Email}, \texttt{Street}, \texttt{Ward}, \texttt{District}, \texttt{City} & \emph{None} \\
 CLIENT\_\allowbreak{}PHONE & \texttt{ClientID}, \texttt{ContactPhone} & \texttt{ClientID}, \texttt{ContactPhone} & \texttt{ClientID -\textgreater{} CLIENT(\allowbreak{}\allowbreak{}ClientID)} \\
-PROJECT & \texttt{ProjectID} & \texttt{ProjectID}, \texttt{ProjectName}, \texttt{StartDate}, \texttt{PlannedEndDate}, \texttt{ActualEndDate}, \texttt{EstimatedBudget}, \texttt{Status}, \texttt{ClientID}, \texttt{DeptID}, \texttt{DirectorEmpID} & \texttt{ClientID -\textgreater{} CLIENT(\allowbreak{}\allowbreak{}ClientID)}; \texttt{DeptID -\textgreater{} DEPARTMENT(\allowbreak{}\allowbreak{}DeptID)}; \texttt{DirectorEmpID -\textgreater{} EMPLOYEE(\allowbreak{}\allowbreak{}EmpID)} \\
-PROJECT\_\allowbreak{}SITE & \texttt{SiteID} & \texttt{SiteID}, \texttt{ProjectID}, \texttt{SiteName}, \texttt{Latitude}, \texttt{Longitude}, \texttt{StreetAddress}, \texttt{District}, \texttt{City\_\allowbreak{}Province}, \texttt{EnvironmentalPermit}, \texttt{SiteStatus} & \texttt{ProjectID -\textgreater{} PROJECT(\allowbreak{}\allowbreak{}ProjectID)} \\
-PROJECT\_\allowbreak{}PHASE & \texttt{ProjectID}, \texttt{PhaseNumber} (\allowbreak{}partial key) & \texttt{ProjectID}, \texttt{PhaseNumber}, \texttt{PhaseTitle}, \texttt{StartDate}, \texttt{TargetCompletionDate}, \texttt{PhaseBudget}, \texttt{PhaseStatus} & \texttt{ProjectID -\textgreater{} PROJECT(\allowbreak{}\allowbreak{}ProjectID)} \\
-TASK & \texttt{TaskID} & \texttt{TaskID}, \texttt{TaskName}, \texttt{EstimatedHours}, \texttt{ScheduledStartDate}, \texttt{ScheduledEndDate}, \texttt{ActualEndDate}, \texttt{PriorityLevel}, \texttt{TaskStatus}, \texttt{ProjectID}, \texttt{PhaseNumber} & \texttt{(\allowbreak{}\allowbreak{}ProjectID, PhaseNumber) -\textgreater{} PROJECT\_\allowbreak{}PHASE(\allowbreak{}\allowbreak{}ProjectID, PhaseNumber)} \\
+PROJECT & \texttt{ProjectID} & \texttt{ProjectID}, \texttt{ProjectName}, \texttt{ContractNumber}, \texttt{EstimatedBudget}, \texttt{ActualCost}, \texttt{StartDate}, \texttt{ScheduledEndDate}, \texttt{ActualEndDate}, \texttt{Status}, \texttt{ClientID}, \texttt{DeptID}, \texttt{DirectorEmpID} & \texttt{ClientID -\textgreater{} CLIENT(\allowbreak{}\allowbreak{}ClientID)}; \texttt{DeptID -\textgreater{} DEPARTMENT(\allowbreak{}\allowbreak{}DeptID)}; \texttt{DirectorEmpID -\textgreater{} EMPLOYEE(\allowbreak{}\allowbreak{}EmpID)} \\
+PROJECT\_\allowbreak{}SITE & \texttt{SiteID} & \texttt{SiteID}, \texttt{SiteName}, \texttt{Street}, \texttt{Ward}, \texttt{District}, \texttt{City}, \texttt{Latitude}, \texttt{Longitude}, \texttt{ProjectID} & \texttt{ProjectID -\textgreater{} PROJECT(\allowbreak{}\allowbreak{}ProjectID)} \\
+PROJECT\_\allowbreak{}PHASE & \texttt{ProjectID}, \texttt{PhaseNumber} (\allowbreak{}partial key) & \texttt{ProjectID}, \texttt{PhaseNumber}, \texttt{PhaseName}, \texttt{PhaseBudget}, \texttt{StartDate}, \texttt{ScheduledEndDate}, \texttt{ActualEndDate}, \texttt{Status}, \texttt{ProgressPercentage} & \texttt{ProjectID -\textgreater{} PROJECT(\allowbreak{}\allowbreak{}ProjectID)} \\
+TASK & \texttt{TaskID} & \texttt{TaskID}, \texttt{TaskName}, \texttt{Description}, \texttt{EstimatedCost}, \texttt{ActualCost}, \texttt{StartDate}, \texttt{EndDate}, \texttt{Status}, \texttt{ProjectID}, \texttt{PhaseNumber} & \texttt{(\allowbreak{}\allowbreak{}ProjectID, PhaseNumber) -\textgreater{} PROJECT\_\allowbreak{}PHASE(\allowbreak{}\allowbreak{}ProjectID, PhaseNumber)} \\
 PRECEDES & \texttt{PredecessorTaskID}, \texttt{SuccessorTaskID} & \texttt{PredecessorTaskID}, \texttt{SuccessorTaskID} & \texttt{PredecessorTaskID -\textgreater{} TASK(\allowbreak{}\allowbreak{}TaskID)}; \texttt{SuccessorTaskID -\textgreater{} TASK(\allowbreak{}\allowbreak{}TaskID)} \\
-WORKS\_\allowbreak{}ON\_\allowbreak{}TASK & \texttt{EmpID}, \texttt{TaskID} & \texttt{EmpID}, \texttt{TaskID}, \texttt{AssignedDate}, \texttt{RoleOnTask}, \texttt{HoursLogged} & \texttt{EmpID -\textgreater{} EMPLOYEE(\allowbreak{}\allowbreak{}EmpID)}; \texttt{TaskID -\textgreater{} TASK(\allowbreak{}\allowbreak{}TaskID)} \\
+WORKS\_\allowbreak{}ON\_\allowbreak{}TASK & \texttt{EmpID}, \texttt{TaskID} & \texttt{EmpID}, \texttt{TaskID}, \texttt{HoursLogged}, \texttt{RoleDescription}, \texttt{AssignedDate} & \texttt{EmpID -\textgreater{} EMPLOYEE(\allowbreak{}\allowbreak{}EmpID)}; \texttt{TaskID -\textgreater{} TASK(\allowbreak{}\allowbreak{}TaskID)} \\
 \end{longtable}
 }
 
 \subsection{Equipment}\label{equipment-1}
 
-\texttt{EQUIPMENT} omits derived \texttt{TotalRunHours}, \texttt{MAINTENANCE\_\allowbreak{}RECORD} inherits \texttt{EquipmentID} with partial key \texttt{RecordNumber}, and \texttt{EQUIPMENT\_\allowbreak{}DEPLOYMENT} adds \texttt{OperatorEmpID} from the \texttt{OPERATES} aggregation relationship.
+\texttt{EQUIPMENT} retains \texttt{TotalRunHours} as a materialized meter total, \texttt{MAINTENANCE\_\allowbreak{}RECORD} inherits \texttt{EquipmentID} with partial key \texttt{RecordNumber}, and \texttt{EQUIPMENT\_\allowbreak{}DEPLOYMENT} adds \texttt{OperatorEmpID} from the \texttt{OPERATES} aggregation relationship.
 
 {\def\LTcaptype{none} % do not increment counter
 \begin{longtable}[]{@{}
@@ -1475,15 +1462,15 @@ Foreign Keys
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-EQUIPMENT & \texttt{EquipmentID} & \texttt{EquipmentID}, \texttt{Model}, \texttt{SerialNumber}, \texttt{Category}, \texttt{Ownership}, \texttt{HourlyRate}, \texttt{CurrentStatus} & \emph{None} \\
-MAINTENANCE\_\allowbreak{}RECORD & \texttt{EquipmentID}, \texttt{RecordNumber} (\allowbreak{}partial key) & \texttt{EquipmentID}, \texttt{RecordNumber}, \texttt{ServiceDate}, \texttt{MaintenanceType}, \texttt{Cost}, \texttt{ServiceVendor} & \texttt{EquipmentID -\textgreater{} EQUIPMENT(\allowbreak{}\allowbreak{}EquipmentID)} \\
-EQUIPMENT\_\allowbreak{}DEPLOYMENT & \texttt{EquipmentID}, \texttt{SiteID}, \texttt{DeploymentStartDate} & \texttt{EquipmentID}, \texttt{SiteID}, \texttt{DeploymentStartDate}, \texttt{DeploymentEndDate}, \texttt{HoursOperated}, \texttt{OperatorEmpID} & \texttt{EquipmentID -\textgreater{} EQUIPMENT(\allowbreak{}\allowbreak{}EquipmentID)}; \texttt{SiteID -\textgreater{} PROJECT\_\allowbreak{}SITE(\allowbreak{}\allowbreak{}SiteID)}; \texttt{OperatorEmpID -\textgreater{} EMPLOYEE(\allowbreak{}\allowbreak{}EmpID)} \\
+EQUIPMENT & \texttt{EquipmentID} & \texttt{EquipmentID}, \texttt{SerialNumber}, \texttt{EquipmentName}, \texttt{Category}, \texttt{Capacity}, \texttt{HourlyRate}, \texttt{Status}, \texttt{TotalRunHours} & \emph{None} \\
+MAINTENANCE\_\allowbreak{}RECORD & \texttt{EquipmentID}, \texttt{RecordNumber} (\allowbreak{}partial key) & \texttt{EquipmentID}, \texttt{RecordNumber}, \texttt{MaintenanceDate}, \texttt{MaintenanceType}, \texttt{Description}, \texttt{Cost}, \texttt{PerformedBy} & \texttt{EquipmentID -\textgreater{} EQUIPMENT(\allowbreak{}\allowbreak{}EquipmentID)} \\
+EQUIPMENT\_\allowbreak{}DEPLOYMENT & \texttt{EquipmentID}, \texttt{SiteID}, \texttt{DeploymentStartDate} & \texttt{EquipmentID}, \texttt{SiteID}, \texttt{DeploymentStartDate}, \texttt{DeploymentEndDate}, \texttt{OperatingHours}, \texttt{OperatorEmpID} & \texttt{EquipmentID -\textgreater{} EQUIPMENT(\allowbreak{}\allowbreak{}EquipmentID)}; \texttt{SiteID -\textgreater{} PROJECT\_\allowbreak{}SITE(\allowbreak{}\allowbreak{}SiteID)}; \texttt{OperatorEmpID -\textgreater{} EMPLOYEE(\allowbreak{}\allowbreak{}EmpID)} \\
 \end{longtable}
 }
 
 \subsection{Materials and procurement}\label{materials-and-procurement}
 
-\texttt{SUPPLIER\_\allowbreak{}PHONE} and \texttt{SUPPLIER\_\allowbreak{}CATEGORY} extract multi-valued supplier attributes, derived \texttt{TotalPOAmount} and \texttt{ItemSubtotal} are omitted, \texttt{DELIVERY\_\allowbreak{}DISPATCH} adds \texttt{PO\_\allowbreak{}ID} (\allowbreak{}\texttt{FULFILLS\_\allowbreak{}PO}) and \texttt{ReceivedByEmpID} (\allowbreak{}\texttt{RECEIVES\_\allowbreak{}DELIVERY}) from aggregation links, and \texttt{MATERIAL\_\allowbreak{}USAGE} maps the ternary consumption relationship.
+\texttt{SUPPLIER} expands composite \texttt{Address}, \texttt{SUPPLIER\_\allowbreak{}PHONE} and \texttt{SUPPLIER\_\allowbreak{}CATEGORY} extract multi-valued supplier attributes, \texttt{ItemSubtotal} is omitted as derived while \texttt{PURCHASE\_\allowbreak{}ORDER.\allowbreak{}TotalAmount} is materialized, \texttt{DELIVERY\_\allowbreak{}DISPATCH} adds \texttt{PO\_\allowbreak{}ID} (\allowbreak{}\texttt{FULFILLS\_\allowbreak{}PO}) and \texttt{ReceivedByEmpID} (\allowbreak{}\texttt{RECEIVES\_\allowbreak{}DELIVERY}) from aggregation links alongside \texttt{SupplierID} from the ternary mapping, and \texttt{MATERIAL\_\allowbreak{}USAGE} maps the ternary consumption relationship.
 
 {\def\LTcaptype{none} % do not increment counter
 \begin{longtable}[]{@{}
@@ -1505,15 +1492,15 @@ Foreign Keys
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-SUPPLIER & \texttt{SupplierID} & \texttt{SupplierID}, \texttt{CompanyName}, \texttt{TaxCode}, \texttt{ContactEmail}, \texttt{CreditRating} & \emph{None} \\
+SUPPLIER & \texttt{SupplierID} & \texttt{SupplierID}, \texttt{SupplierName}, \texttt{TaxCode}, \texttt{Email}, \texttt{Street}, \texttt{Ward}, \texttt{District}, \texttt{City} & \emph{None} \\
 SUPPLIER\_\allowbreak{}PHONE & \texttt{SupplierID}, \texttt{ContactPhone} & \texttt{SupplierID}, \texttt{ContactPhone} & \texttt{SupplierID -\textgreater{} SUPPLIER(\allowbreak{}\allowbreak{}SupplierID)} \\
 SUPPLIER\_\allowbreak{}CATEGORY & \texttt{SupplierID}, \texttt{SupplyCategory} & \texttt{SupplierID}, \texttt{SupplyCategory} & \texttt{SupplierID -\textgreater{} SUPPLIER(\allowbreak{}\allowbreak{}SupplierID)} \\
-MATERIAL & \texttt{MaterialID} & \texttt{MaterialID}, \texttt{MaterialName}, \texttt{Category}, \texttt{StandardUnit}, \texttt{UnitPrice}, \texttt{MinStock} & \emph{None} \\
-PURCHASE\_\allowbreak{}ORDER & \texttt{PO\_\allowbreak{}ID} & \texttt{PO\_\allowbreak{}ID}, \texttt{OrderDate}, \texttt{ExpectedDeliveryDate}, \texttt{DeliveryStatus}, \texttt{ProjectID}, \texttt{SupplierID} & \texttt{ProjectID -\textgreater{} PROJECT(\allowbreak{}\allowbreak{}ProjectID)}; \texttt{SupplierID -\textgreater{} SUPPLIER(\allowbreak{}\allowbreak{}SupplierID)} \\
-PO\_\allowbreak{}ITEM & \texttt{PO\_\allowbreak{}ID}, \texttt{LineNumber} (\allowbreak{}partial key) & \texttt{PO\_\allowbreak{}ID}, \texttt{LineNumber}, \texttt{QuantityOrdered}, \texttt{AgreedUnitPrice}, \texttt{MaterialID} & \texttt{PO\_\allowbreak{}ID -\textgreater{} PURCHASE\_\allowbreak{}ORDER(\allowbreak{}\allowbreak{}PO\_\allowbreak{}ID)}; \texttt{MaterialID -\textgreater{} MATERIAL(\allowbreak{}\allowbreak{}MaterialID)} \\
-SITE\_\allowbreak{}INVENTORY & \texttt{SiteID}, \texttt{MaterialID} & \texttt{SiteID}, \texttt{MaterialID}, \texttt{CurrentStockQuantity}, \texttt{SafetyReorderQuantity}, \texttt{LastStocktakeDate} & \texttt{SiteID -\textgreater{} PROJECT\_\allowbreak{}SITE(\allowbreak{}\allowbreak{}SiteID)}; \texttt{MaterialID -\textgreater{} MATERIAL(\allowbreak{}\allowbreak{}MaterialID)} \\
-DELIVERY\_\allowbreak{}DISPATCH & \texttt{DeliveryCode} & \texttt{DeliveryCode}, \texttt{SupplierID}, \texttt{MaterialID}, \texttt{SiteID}, \texttt{DeliveryDate}, \texttt{DeliveredQuantity}, \texttt{ReceivedByEmpID}, \texttt{PO\_\allowbreak{}ID} & \texttt{SupplierID -\textgreater{} SUPPLIER(\allowbreak{}\allowbreak{}SupplierID)}; \texttt{MaterialID -\textgreater{} MATERIAL(\allowbreak{}\allowbreak{}MaterialID)}; \texttt{SiteID -\textgreater{} PROJECT\_\allowbreak{}SITE(\allowbreak{}\allowbreak{}SiteID)}; \texttt{ReceivedByEmpID -\textgreater{} EMPLOYEE(\allowbreak{}\allowbreak{}EmpID)}; \texttt{PO\_\allowbreak{}ID -\textgreater{} PURCHASE\_\allowbreak{}ORDER(\allowbreak{}\allowbreak{}PO\_\allowbreak{}ID)} \\
-MATERIAL\_\allowbreak{}USAGE & \texttt{TaskID}, \texttt{MaterialID}, \texttt{SiteID}, \texttt{UsageDate} & \texttt{TaskID}, \texttt{MaterialID}, \texttt{SiteID}, \texttt{UsageDate}, \texttt{QuantityUsed} & \texttt{TaskID -\textgreater{} TASK(\allowbreak{}\allowbreak{}TaskID)}; \texttt{MaterialID -\textgreater{} MATERIAL(\allowbreak{}\allowbreak{}MaterialID)}; \texttt{SiteID -\textgreater{} PROJECT\_\allowbreak{}SITE(\allowbreak{}\allowbreak{}SiteID)} \\
+MATERIAL & \texttt{MaterialID} & \texttt{MaterialID}, \texttt{MaterialName}, \texttt{Unit}, \texttt{StandardPrice} & \emph{None} \\
+PURCHASE\_\allowbreak{}ORDER & \texttt{PO\_\allowbreak{}ID} & \texttt{PO\_\allowbreak{}ID}, \texttt{OrderDate}, \texttt{TotalAmount}, \texttt{Status}, \texttt{ProjectID}, \texttt{SupplierID} & \texttt{ProjectID -\textgreater{} PROJECT(\allowbreak{}\allowbreak{}ProjectID)}; \texttt{SupplierID -\textgreater{} SUPPLIER(\allowbreak{}\allowbreak{}SupplierID)} \\
+PO\_\allowbreak{}ITEM & \texttt{PO\_\allowbreak{}ID}, \texttt{LineNumber} (\allowbreak{}partial key) & \texttt{PO\_\allowbreak{}ID}, \texttt{LineNumber}, \texttt{OrderQuantity}, \texttt{UnitPrice}, \texttt{MaterialID} & \texttt{PO\_\allowbreak{}ID -\textgreater{} PURCHASE\_\allowbreak{}ORDER(\allowbreak{}\allowbreak{}PO\_\allowbreak{}ID)}; \texttt{MaterialID -\textgreater{} MATERIAL(\allowbreak{}\allowbreak{}MaterialID)} \\
+SITE\_\allowbreak{}INVENTORY & \texttt{SiteID}, \texttt{MaterialID} & \texttt{SiteID}, \texttt{MaterialID}, \texttt{CurrentStockQuantity}, \texttt{MinStock}, \texttt{ReorderQuantity} & \texttt{SiteID -\textgreater{} PROJECT\_\allowbreak{}SITE(\allowbreak{}\allowbreak{}SiteID)}; \texttt{MaterialID -\textgreater{} MATERIAL(\allowbreak{}\allowbreak{}MaterialID)} \\
+DELIVERY\_\allowbreak{}DISPATCH & \texttt{DeliveryCode} & \texttt{DeliveryCode}, \texttt{DeliveryDate}, \texttt{DeliveredQuantity}, \texttt{Status}, \texttt{MaterialID}, \texttt{SiteID}, \texttt{ReceivedByEmpID}, \texttt{PO\_\allowbreak{}ID}, \texttt{SupplierID} & \texttt{SupplierID -\textgreater{} SUPPLIER(\allowbreak{}\allowbreak{}SupplierID)}; \texttt{MaterialID -\textgreater{} MATERIAL(\allowbreak{}\allowbreak{}MaterialID)}; \texttt{SiteID -\textgreater{} PROJECT\_\allowbreak{}SITE(\allowbreak{}\allowbreak{}SiteID)}; \texttt{ReceivedByEmpID -\textgreater{} EMPLOYEE(\allowbreak{}\allowbreak{}EmpID)}; \texttt{PO\_\allowbreak{}ID -\textgreater{} PURCHASE\_\allowbreak{}ORDER(\allowbreak{}\allowbreak{}PO\_\allowbreak{}ID)} \\
+MATERIAL\_\allowbreak{}USAGE & \texttt{TaskID}, \texttt{MaterialID}, \texttt{SiteID}, \texttt{UsageDate} & \texttt{TaskID}, \texttt{MaterialID}, \texttt{SiteID}, \texttt{UsageDate}, \texttt{UsedQuantity} & \texttt{TaskID -\textgreater{} TASK(\allowbreak{}\allowbreak{}TaskID)}; \texttt{MaterialID -\textgreater{} MATERIAL(\allowbreak{}\allowbreak{}MaterialID)}; \texttt{SiteID -\textgreater{} PROJECT\_\allowbreak{}SITE(\allowbreak{}\allowbreak{}SiteID)} \\
 \end{longtable}
 }
 
@@ -1541,8 +1528,8 @@ Foreign Keys
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-SUBCONTRACTOR & \texttt{SubcontractorID} & \texttt{SubcontractorID}, \texttt{CompanyName}, \texttt{TaxCode}, \texttt{ContactEmail}, \texttt{ContactPhone}, \texttt{TradeSpecialty}, \texttt{LicenseNumber}, \texttt{SafetyRatingScore} & \emph{None} \\
-SUBCONTRACT & \texttt{ContractAgreementNo} & \texttt{ContractAgreementNo}, \texttt{ProjectID}, \texttt{SubcontractorID}, \texttt{ScopeDescription}, \texttt{ContractValue}, \texttt{WarrantyHoldRate}, \texttt{StartDate}, \texttt{CompletionDate} & \texttt{ProjectID -\textgreater{} PROJECT(\allowbreak{}\allowbreak{}ProjectID)}; \texttt{SubcontractorID -\textgreater{} SUBCONTRACTOR(\allowbreak{}\allowbreak{}SubcontractorID)} \\
+SUBCONTRACTOR & \texttt{SubcontractorID} & \texttt{SubcontractorID}, \texttt{SubcontractorName}, \texttt{TaxCode}, \texttt{Specialization}, \texttt{ContactPerson}, \texttt{ContactPhone}, \texttt{ContactEmail}, \texttt{LicenseNumber} & \emph{None} \\
+SUBCONTRACT & \texttt{ContractAgreementNo} & \texttt{ContractAgreementNo}, \texttt{ProjectID}, \texttt{SubcontractorID}, \texttt{ScopeOfWork}, \texttt{ContractValue}, \texttt{WarrantyHoldRate}, \texttt{StartDate}, \texttt{EndDate} & \texttt{ProjectID -\textgreater{} PROJECT(\allowbreak{}\allowbreak{}ProjectID)}; \texttt{SubcontractorID -\textgreater{} SUBCONTRACTOR(\allowbreak{}\allowbreak{}SubcontractorID)} \\
 \end{longtable}
 }
 

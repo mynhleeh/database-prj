@@ -7,14 +7,11 @@ local IMAGE_MAP = {
   ["erd/erd.png"] = "erd/erd.pdf",
   ["schema/schema.svg"] = "schema/schema.pdf",
   ["schema/schema.png"] = "schema/schema.pdf",
-  ["schema/schema-v2.svg"] = "schema/schema-v2.pdf",
-  ["schema/schema-v2.png"] = "schema/schema-v2.pdf",
 }
 
 local LANDSCAPE_FIGURES = {
   ["erd/erd.pdf"] = true,
   ["schema/schema.pdf"] = true,
-  ["schema/schema-v2.pdf"] = true,
 }
 
 local function normalize_src(src)

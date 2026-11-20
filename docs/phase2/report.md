@@ -2,7 +2,7 @@
 
 **KHOA CÔNG NGHỆ THÔNG TIN**
 
-![](./latex/logo.png)
+![](./logo.png)
 
 **DATABASE DESIGN TERM PROJECT**
 
@@ -99,25 +99,26 @@ Database coverage spans seven operational areas:
 |----|----|----|
 | ClientID | Primary Key | Unique client identifier |
 | ClientName | Simple | Organization or company name |
-| ClientType | Simple | Sector (Government, Commercial, Residential, Industrial) |
-| ContactPerson | Simple | Primary contact person |
-| ContactEmail | Simple | Email address |
-| ContactPhone | Multi-valued | Contact phone numbers |
 | TaxCode | Candidate Key | Business tax code |
+| RepresentativeName | Simple | Primary authorized representative |
+| Email | Candidate Key | Official contact email address |
+| Address | Composite | Composed of Street, Ward, District, City |
+| ContactPhone | Multi-valued | Contact phone numbers |
 
 #### 4. PROJECT
 
 | Attribute | Type | Description |
 |----|----|----|
-| ProjectID | Primary Key | Project code (e.g., PRJ-2026-001) |
-| ProjectName | Simple | Project name |
-| StartDate | Simple | Planned start date |
-| PlannedEndDate | Simple | Contractual deadline |
-| ActualEndDate | Simple | Real completion date (null if ongoing) |
-| ProjectDuration | Derived | Elapsed days from StartDate to ActualEndDate or today |
+| ProjectID | Primary Key | Project code (e.g., PRJ001) |
+| ProjectName | Candidate Key | Unique project name |
+| ContractNumber | Candidate Key | Unique signed contract reference |
 | EstimatedBudget | Simple | Contract budget limit |
 | ActualCost | Derived | Total cost of labor, equipment, materials, and subcontracts |
-| Status | Simple | Planned, In-Progress, Suspended, Completed |
+| StartDate | Simple | Planned start date |
+| ScheduledEndDate | Simple | Contractual scheduled deadline |
+| ActualEndDate | Simple | Real completion date (null if ongoing) |
+| ProjectDuration | Derived | Elapsed days from StartDate to ActualEndDate or today |
+| Status | Simple | Planning, Active, Suspended, Completed, Cancelled |
 
 #### 5. PROJECT_SITE
 
@@ -125,60 +126,55 @@ Database coverage spans seven operational areas:
 |----|----|----|
 | SiteID | Primary Key | Unique site identifier |
 | SiteName | Simple | Site name or sector |
+| Address | Composite | Composed of Street, Ward, District, City |
 | LocationCoordinates | Composite | Composed of Latitude, Longitude |
-| Address | Composite | Composed of StreetAddress, District, City_Province |
-| EnvironmentalPermit | Simple | Environmental permit number |
-| SiteStatus | Simple | Operating state (Preparation, Active, Handed_Over) |
 
 #### 6. TASK
 
 | Attribute | Type | Description |
 |----|----|----|
 | TaskID | Primary Key | Unique task identifier |
-| TaskName | Simple | Task name (Pour pile B12) |
-| EstimatedHours | Simple | Estimated work hours |
-| ActualHours | Derived | Sum of worker hours logged on this task |
-| ScheduledStartDate | Simple | Scheduled start date |
-| ScheduledEndDate | Simple | Scheduled end date |
-| ActualEndDate | Simple | Actual completion date (null if ongoing) |
-| PriorityLevel | Simple | Low, Medium, High, Urgent |
-| TaskStatus | Simple | Execution state (Pending, In_Progress, Completed, Blocked) |
+| TaskName | Simple | Task name |
+| Description | Simple | Detailed scope and technical notes |
+| EstimatedCost | Simple | Estimated task cost |
+| ActualCost | Derived | Actual accumulated task cost |
+| StartDate | Simple | Scheduled start date |
+| EndDate | Simple | Scheduled end date |
+| Status | Simple | Execution state (Not-Started, In-Progress, Completed, Blocked) |
 
 #### 7. EQUIPMENT
 
 | Attribute | Type | Description |
 |----|----|----|
 | EquipmentID | Primary Key | Unique asset code |
-| Model | Simple | Make and model (CAT 320D) |
 | SerialNumber | Candidate Key | Manufacturer serial number |
-| Category | Simple | Excavator, Crane, Truck, Paver, Mixer |
-| Ownership | Simple | Owned or Rented |
+| EquipmentName | Simple | Make and equipment name |
+| Category | Simple | Equipment category (Tower Crane, Heavy Crane, Excavator, Concrete Pump, Asphalt Roller) |
+| Capacity | Simple | Rated operating capacity (e.g., 12 Tons, 2.5 m3) |
 | HourlyRate | Simple | Cost per operating hour |
-| CurrentStatus | Simple | Available, Deployed, Under-Maintenance, Retired |
+| Status | Simple | Available, Deployed, Under-Maintenance, Decommissioned |
 | TotalRunHours | Derived | Total operating hours across all jobs |
 
 #### 8. SUPPLIER
 
-| Attribute        | Type          | Description                           |
-|------------------|---------------|---------------------------------------|
-| SupplierID       | Primary Key   | Unique vendor identifier              |
-| CompanyName      | Simple        | Registered company name               |
-| TaxCode          | Candidate Key | Official business tax ID              |
-| ContactEmail     | Simple        | Sales email                           |
-| ContactPhone     | Multi-valued  | Contact phone numbers                 |
-| SupplyCategories | Multi-valued  | Product lines (Steel, Cement, Lumber) |
-| CreditRating     | Simple        | Rating grade (A, B, C)                |
+| Attribute | Type | Description |
+|----|----|----|
+| SupplierID | Primary Key | Unique vendor identifier |
+| SupplierName | Simple | Registered company name |
+| TaxCode | Candidate Key | Official business tax ID |
+| Email | Candidate Key | Official sales email |
+| Address | Composite | Composed of Street, Ward, District, City |
+| ContactPhone | Multi-valued | Contact phone numbers |
+| SupplyCategories | Multi-valued | Product lines (Reinforcing Steel, Cement, Concrete) |
 
 #### 9. MATERIAL
 
 | Attribute | Type | Description |
 |----|----|----|
 | MaterialID | Primary Key | Unique material SKU |
-| MaterialName | Simple | Material name (Portland Cement PCB40) |
-| Category | Simple | Material classification (Steel, Cement, Aggregate, Piping, Electrical) |
-| StandardUnit | Simple | Unit of measurement (Ton, m3, Bag, Piece) |
-| UnitPrice | Simple | Reference price per unit |
-| MinStock | Simple | Minimum safety stock count |
+| MaterialName | Candidate Key | Material name (e.g., Portland Blended Cement PCB40 Bulk) |
+| Unit | Simple | Unit of measurement (Ton, m3, Bag, Piece) |
+| StandardPrice | Simple | Benchmark price per unit |
 
 #### 10. PURCHASE_ORDER
 
@@ -186,22 +182,21 @@ Database coverage spans seven operational areas:
 |----|----|----|
 | PO_ID | Primary Key | Unique PO number |
 | OrderDate | Simple | Date order was placed |
-| ExpectedDeliveryDate | Simple | Promised arrival date |
-| DeliveryStatus | Simple | Issued, Partial_Delivery, Fulfilled, Cancelled |
-| TotalPOAmount | Derived | Sum of line subtotals |
+| TotalAmount | Derived | Sum of line subtotals |
+| Status | Simple | Draft, Approved, Shipped, Received, Cancelled |
 
 #### 11. SUBCONTRACTOR
 
 | Attribute | Type | Description |
 |----|----|----|
 | SubcontractorID | Primary Key | Unique subcontractor identifier |
-| CompanyName | Simple | Registered company name |
+| SubcontractorName | Simple | Registered company name |
 | TaxCode | Candidate Key | Official business tax ID |
-| ContactEmail | Simple | Official contact email |
+| Specialization | Simple | Specialized trade (MEP, Diaphragm Wall, Post-Tensioning) |
+| ContactPerson | Simple | Primary contact representative |
 | ContactPhone | Simple | Primary dispatch phone number |
-| TradeSpecialty | Simple | Specialized trade (Piling, Electrical, HVAC, Facade) |
+| ContactEmail | Simple | Official contact email |
 | LicenseNumber | Candidate Key | Trade license number |
-| SafetyRatingScore | Simple | Safety score (0.0 to 10.0) |
 
 #### 12. SAFETY_INSPECTION
 
@@ -209,10 +204,10 @@ Database coverage spans seven operational areas:
 |----|----|----|
 | InspectionID | Primary Key | Unique inspection log ID |
 | InspectionDate | Simple | Date of inspection |
-| InspectionType | Simple | Audit type (Routine, Unannounced, Pre-Operation) |
-| InspectionScope | Simple | Inspected area or structure (e.g., Tower crane, Scaffold level 4) |
-| OverallScore | Simple | Evaluation score (0 to 100) |
-| InspectionResult | Simple | Audit conclusion (Passed, Conditional_Pass, Failed) |
+| InspectionType | Simple | Audit type (Daily, Weekly, Monthly, Surprise, Post-Incident) |
+| InspectionScope | Simple | Inspected area or structure |
+| OverallScore | Simple | Evaluation score (0.00 to 100.00) |
+| InspectionResult | Simple | Audit conclusion (Pass, Conditional-Pass, Fail) |
 | ViolationNoted | Simple | Safety issues found |
 | FixDeadline | Simple | Deadline to fix issues (null if passed) |
 
@@ -222,8 +217,8 @@ Database coverage spans seven operational areas:
 |----|----|----|
 | IncidentID | Primary Key | Unique incident case ID |
 | IncidentTimestamp | Simple | Date and time of incident |
-| IncidentType | Simple | Event category (Fall, Electrical, Equipment_Collision, Falling_Object) |
-| IncidentLevel | Simple | Impact classification (Warning, Minor, Serious, Fatal) |
+| IncidentType | Simple | Event category (Near-Miss, Minor-Injury, Major-Injury, Fatality, Equipment-Damage, Fire, Collapse) |
+| IncidentLevel | Simple | Impact classification (Level-1, Level-2, Level-3, Level-4) |
 | DamageDescription | Simple | Injury or equipment damage details |
 | LostDays | Simple | Work days lost due to injury |
 | Solution | Simple | Immediate remedial or preventive action taken |
@@ -235,10 +230,9 @@ Database coverage spans seven operational areas:
 | Attribute | Type | Description |
 |----|----|----|
 | DependentName | Partial Key | Full name of dependent |
-| Gender | Simple | Gender (M, F, Other) |
-| BirthDate | Simple | Date of birth |
 | Relationship | Simple | Relationship to employee (Spouse, Child, Parent) |
-| ContactPhone | Simple | Emergency contact phone number |
+| Gender | Simple | Gender (Male, Female, Other) |
+| DOB | Simple | Date of birth |
 | IsEmergencyContact | Simple | Primary emergency contact flag (true or false) |
 
 #### 2. PROJECT_PHASE
@@ -246,30 +240,33 @@ Database coverage spans seven operational areas:
 | Attribute | Type | Description |
 |----|----|----|
 | PhaseNumber | Partial Key | Phase sequence number (1, 2, 3...) |
-| PhaseTitle | Simple | Phase title (Excavation, Structure) |
-| StartDate | Simple | Scheduled start date for this phase |
-| TargetCompletionDate | Simple | Target completion date for phase |
+| PhaseName | Simple | Phase title (Excavation, Structure) |
 | PhaseBudget | Simple | Budget allocated to this phase |
-| PhaseStatus | Simple | Pending, Active, Under-Inspection, Accepted |
+| StartDate | Simple | Scheduled start date for this phase |
+| ScheduledEndDate | Simple | Target completion date for phase |
+| ActualEndDate | Simple | Real completion date (null if ongoing) |
+| Status | Simple | Pending, In-Progress, Completed, Delayed |
+| ProgressPercentage | Simple | Completion progress percentage (0.00 to 100.00) |
 
 #### 3. PO_ITEM
 
-| Attribute       | Type        | Description                                   |
-|-----------------|-------------|-----------------------------------------------|
-| LineNumber      | Partial Key | Line item number (1, 2, 3...)                 |
-| QuantityOrdered | Simple      | Quantity purchased                            |
-| AgreedUnitPrice | Simple      | Negotiated unit price                         |
-| ItemSubtotal    | Derived     | QuantityOrdered multiplied by AgreedUnitPrice |
+| Attribute | Type | Description |
+|----|----|----|
+| LineNumber | Partial Key | Line item number (1, 2, 3...) |
+| OrderQuantity | Simple | Quantity purchased |
+| UnitPrice | Simple | Negotiated unit price |
+| ItemSubtotal | Derived | OrderQuantity multiplied by UnitPrice |
 
 #### 4. MAINTENANCE_RECORD
 
 | Attribute | Type | Description |
 |----|----|----|
 | RecordNumber | Partial Key | Service record counter |
-| ServiceDate | Simple | Date of service |
-| MaintenanceType | Simple | Service type (Oil Change, Inspection, Hydraulic Repair, Overhaul) |
+| MaintenanceDate | Simple | Date of service |
+| MaintenanceType | Simple | Service type (Routine, Preventive, Corrective, Emergency) |
+| Description | Simple | Scope of maintenance work |
 | Cost | Simple | Repair and parts cost |
-| ServiceVendor | Simple | Workshop name or external vendor |
+| PerformedBy | Simple | Workshop name or technical vendor |
 
 # 3. Relationships and constraints
 
@@ -338,20 +335,20 @@ Database coverage spans seven operational areas:
 ### 12. WORKS_ON_TASK (EMPLOYEE to TASK)
 
 - Binary M:N
-- Attributes: `AssignedDate`, `RoleOnTask`, `HoursLogged`
+- Attributes: `AssignedDate`, `RoleDescription`, `HoursLogged`
 - Participation: `EMPLOYEE` is partial; `TASK` is total (every task requires at least one assigned worker).
 
 ### 13. EQUIPMENT_DEPLOYMENT (EQUIPMENT to PROJECT_SITE)
 
 - Binary M:N (modeled as an aggregation for operator assignment)
-- Attributes: `DeploymentStartDate`, `DeploymentEndDate`, `HoursOperated`
+- Attributes: `DeploymentStartDate`, `DeploymentEndDate`, `OperatingHours`
 - Participation: Both `EQUIPMENT` and `PROJECT_SITE` are partial.
 
 ### 14. OPERATES (EMPLOYEE to EQUIPMENT_DEPLOYMENT)
 
 - Binary 1:N over the `EQUIPMENT_DEPLOYMENT` aggregation
-- Participation: Both `EMPLOYEE` and `EQUIPMENT_DEPLOYMENT` are partial.
-- Rule: Associates each equipment deployment with at most one primary operator (`OperatorEmpID` in the relational schema).
+- Participation: `EMPLOYEE` is partial; `EQUIPMENT_DEPLOYMENT` is total (every equipment deployment must be assigned one certified primary operator).
+- Rule: Associates each equipment deployment with exactly one primary operator (`OperatorEmpID` in the relational schema).
 
 ### 15. HAS_MAINTENANCE (EQUIPMENT to MAINTENANCE_RECORD)
 
@@ -381,13 +378,13 @@ Database coverage spans seven operational areas:
 ### 20. SITE_INVENTORY (PROJECT_SITE to MATERIAL)
 
 - Binary M:N
-- Attributes: `CurrentStockQuantity`, `SafetyReorderQuantity`, `LastStocktakeDate`
+- Attributes: `CurrentStockQuantity`, `MinStock`, `ReorderQuantity`
 - Participation: Both `PROJECT_SITE` and `MATERIAL` are partial.
 
 ### 21. DELIVERY_DISPATCH (SUPPLIER x MATERIAL x PROJECT_SITE)
 
 - Ternary M:N:P (modeled as an aggregation for purchase-order fulfillment and receiving verification)
-- Attributes: `DeliveryCode`, `DeliveryDate`, `DeliveredQuantity`
+- Attributes: `DeliveryCode`, `DeliveryDate`, `DeliveredQuantity`, `Status`
 - Participation: `SUPPLIER`, `MATERIAL`, and `PROJECT_SITE` are all partial.
 - Rule: Captures each shipment of a specific material delivered by a supplier to a project site on a given date.
 
@@ -404,14 +401,14 @@ Database coverage spans seven operational areas:
 ### 24. MATERIAL_USAGE (TASK x MATERIAL x PROJECT_SITE)
 
 - Ternary N:M:P
-- Attributes: `UsageDate`, `QuantityUsed`
+- Attributes: `UsageDate`, `UsedQuantity`
 - Participation: `TASK`, `MATERIAL`, and `PROJECT_SITE` are all partial.
 - Rule: Records the quantity of a material consumed from a specific site inventory by a task on a given date.
 
 ### 25. ENGAGES_SUBCONTRACTOR (PROJECT to SUBCONTRACTOR)
 
 - Binary M:N
-- Attributes: `ContractAgreementNo`, `ScopeDescription`, `ContractValue`, `WarrantyHoldRate`, `StartDate`, `CompletionDate`
+- Attributes: `ContractAgreementNo`, `ScopeOfWork`, `ContractValue`, `WarrantyHoldRate`, `StartDate`, `EndDate`
 - Participation: Both `PROJECT` and `SUBCONTRACTOR` are partial.
 
 ### 26. HAS_INSPECTION (PROJECT_SITE to SAFETY_INSPECTION)
@@ -448,40 +445,32 @@ Numeric attributes enforce strict positivity or non-negativity bounds across fin
 
 | Rule | Constraint | Applicable Attributes |
 | :--- | :--- | :--- |
-| Positive monetary and rate values | > 0 | `Salary`, `Budget`, `EstimatedBudget`, `PhaseBudget`, `ContractValue`, `UnitPrice`, `AgreedUnitPrice`, `Cost`, `HourlyRate` |
-| Positive sequence and transaction quantities | > 0 | `PhaseNumber`, `LineNumber`, `RecordNumber`, `QuantityOrdered`, `DeliveredQuantity`, `QuantityUsed` |
-| Non-negative stock, hours, and counts | >= 0 | `CurrentStockQuantity`, `MinStock`, `SafetyReorderQuantity`, `EstimatedHours`, `ActualHours`, `HoursLogged`, `HoursOperated`, `TotalRunHours`, `LostDays` |
-| Bounded ratings and percentages | Range check | `SafetyRatingScore` (0.0 to 10.0), `OverallScore` (0 to 100), `WarrantyHoldRate` (0.00 to 100.00) |
+| Positive salaries and transaction quantities | > 0 | `Salary`, `PhaseNumber`, `LineNumber`, `RecordNumber`, `OrderQuantity`, `DeliveredQuantity`, `UsedQuantity` |
+| Non-negative budgets, costs, stock, and hours | >= 0 | `Budget`, `EstimatedBudget`, `ActualCost`, `PhaseBudget`, `EstimatedCost`, `ContractValue`, `Cost`, `HourlyRate`, `StandardPrice`, `UnitPrice`, `TotalAmount`, `CurrentStockQuantity`, `MinStock`, `ReorderQuantity`, `OperatingHours`, `TotalRunHours`, `LostDays` |
+| Bounded hours and percentages | Range check | `HoursLogged` (0.00 to 24.00 per row, max 12.00 daily total), `ProgressPercentage` (0.00 to 100.00), `WarrantyHoldRate` (0.00 to 100.00), `OverallScore` (0.00 to 100.00) |
 
 Categorical and status attributes accept fixed enumerated values:
 
 | Entity.Attribute | Allowed Values |
 | :--- | :--- |
-| `CLIENT.ClientType` | `Government`, `Commercial`, `Residential`, `Industrial` |
-| `DEPENDENT.Gender` | `M`, `F`, `Other` |
-| `DEPENDENT.Relationship` | `Spouse`, `Child`, `Parent` |
-| `PROJECT.Status` | `Planned`, `In-Progress`, `Suspended`, `Completed` |
-| `PROJECT_SITE.SiteStatus` | `Preparation`, `Active`, `Handed_Over` |
-| `PROJECT_PHASE.PhaseStatus` | `Pending`, `Active`, `Under-Inspection`, `Accepted` |
-| `TASK.PriorityLevel` | `Low`, `Medium`, `High`, `Urgent` |
-| `TASK.TaskStatus` | `Pending`, `In_Progress`, `Completed`, `Blocked` |
-| `EQUIPMENT.Category` | `Excavator`, `Crane`, `Truck`, `Paver`, `Mixer` |
-| `EQUIPMENT.Ownership` | `Owned`, `Rented` |
-| `EQUIPMENT.CurrentStatus` | `Available`, `Deployed`, `Under-Maintenance`, `Retired` |
-| `MAINTENANCE_RECORD.MaintenanceType` | `Oil Change`, `Inspection`, `Hydraulic Repair`, `Overhaul` |
-| `SUPPLIER.CreditRating` | `A`, `B`, `C` |
-| `MATERIAL.Category` | `Steel`, `Cement`, `Aggregate`, `Piping`, `Electrical` |
-| `PURCHASE_ORDER.DeliveryStatus` | `Issued`, `Partial_Delivery`, `Fulfilled`, `Cancelled` |
-| `SAFETY_INSPECTION.InspectionType` | `Routine`, `Unannounced`, `Pre-Operation` |
-| `SAFETY_INSPECTION.InspectionResult` | `Passed`, `Conditional_Pass`, `Failed` |
-| `INCIDENT_REPORT.IncidentType` | `Fall`, `Electrical`, `Equipment_Collision`, `Falling_Object` |
-| `INCIDENT_REPORT.IncidentLevel` | `Warning`, `Minor`, `Serious`, `Fatal` |
+| `DEPENDENT.Gender` | `Male`, `Female`, `Other` |
+| `PROJECT.Status` | `Planning`, `Active`, `Suspended`, `Completed`, `Cancelled` |
+| `PROJECT_PHASE.Status` | `Pending`, `In-Progress`, `Completed`, `Delayed` |
+| `TASK.Status` | `Not-Started`, `In-Progress`, `Completed`, `Blocked` |
+| `EQUIPMENT.Status` | `Available`, `Deployed`, `Under-Maintenance`, `Decommissioned` |
+| `MAINTENANCE_RECORD.MaintenanceType` | `Routine`, `Preventive`, `Corrective`, `Emergency` |
+| `PURCHASE_ORDER.Status` | `Draft`, `Approved`, `Shipped`, `Received`, `Cancelled` |
+| `DELIVERY_DISPATCH.Status` | `In-Transit`, `Received`, `Rejected` |
+| `SAFETY_INSPECTION.InspectionType` | `Daily`, `Weekly`, `Monthly`, `Surprise`, `Post-Incident` |
+| `SAFETY_INSPECTION.InspectionResult` | `Pass`, `Conditional-Pass`, `Fail` |
+| `INCIDENT_REPORT.IncidentType` | `Near-Miss`, `Minor-Injury`, `Major-Injury`, `Fatality`, `Equipment-Damage`, `Fire`, `Collapse` |
+| `INCIDENT_REPORT.IncidentLevel` | `Level-1`, `Level-2`, `Level-3`, `Level-4` |
 
 ## 4.2 Date and time rules
 
-- Chronological endpoints must not precede start dates across all scheduled records: `PROJECT` (`StartDate <= PlannedEndDate`, `StartDate <= ActualEndDate`), `PROJECT_PHASE` (`StartDate <= TargetCompletionDate`), `TASK` (`ScheduledStartDate <= ScheduledEndDate`, `ScheduledStartDate <= ActualEndDate`), `PURCHASE_ORDER` (`OrderDate <= ExpectedDeliveryDate`), `EQUIPMENT_DEPLOYMENT` (`DeploymentStartDate <= DeploymentEndDate`), `ENGAGES_SUBCONTRACTOR` (`StartDate <= CompletionDate`), and `SAFETY_INSPECTION` (`InspectionDate <= FixDeadline` when `FixDeadline` is non-null).
+- Chronological endpoints must not precede start dates across all scheduled records: `PROJECT` (`StartDate <= ScheduledEndDate`, `StartDate <= ActualEndDate`), `PROJECT_PHASE` (`StartDate <= ScheduledEndDate`, `StartDate <= ActualEndDate`), `TASK` (`StartDate <= EndDate`), `EQUIPMENT_DEPLOYMENT` (`DeploymentStartDate <= DeploymentEndDate`), `ENGAGES_SUBCONTRACTOR` (`StartDate <= EndDate`), and `SAFETY_INSPECTION` (`InspectionDate <= FixDeadline` when `FixDeadline` is non-null).
 - Workers must be at least 18 years old at hiring and at runtime (`CurrentDate - DOB >= 18 years` and `HireDate >= DOB + 18 years`).
-- Task `ScheduledStartDate` and `ScheduledEndDate` values must fall within the parent `PROJECT_PHASE` interval (`StartDate` to `TargetCompletionDate`).
+- Task `StartDate` and `EndDate` values must fall within the parent `PROJECT_PHASE` interval (`StartDate` to `ScheduledEndDate`).
 
 ## 4.3 Rules not modeled in ERD
 
@@ -492,43 +481,42 @@ These cross-entity and dynamic constraints cannot be expressed directly in Chen 
 3. Operator licensing: An employee linked via `OPERATES` to `EQUIPMENT_DEPLOYMENT` must hold a matching equipment license in `EMPLOYEE.Certifications`.
 4. Daily work limit: Total `HoursLogged` across all `WORKS_ON_TASK` records for a single employee on the same `AssignedDate` cannot exceed 12 hours.
 5. No circular task dependencies: The recursive `PRECEDES` graph over `TASK` must remain a directed acyclic graph (DAG) with no self-loops or cycles.
-6. Stock limit on consumption: `MATERIAL_USAGE.QuantityUsed` for a given `(MaterialID, SiteID)` cannot exceed `SITE_INVENTORY.CurrentStockQuantity` at that site.
-7. Single active project limit for directors: Although `DIRECTS_PROJECT` is modeled as 1:1 in the conceptual schema, historical project records require enforcing that an employee directs at most one `In-Progress` project at any given time.
-8. Accident emergency notification: When `INCIDENT_REPORT` references an injured employee via `INVOLVES_EMPLOYEE`, the system must query `DEPENDENT` where `IsEmergencyContact = true` to notify the designated emergency contact.
+6. Stock limit on consumption: `MATERIAL_USAGE.UsedQuantity` for a given `(MaterialID, SiteID)` cannot exceed `SITE_INVENTORY.CurrentStockQuantity` at that site.
+7. Single active project limit for directors: Although `DIRECTS_PROJECT` is modeled as 1:1 in the conceptual schema, historical project records require enforcing that an employee directs at most one `Active` project at any given time.
 
 # 5. Database applications
 
 ## 5.1 Data loading
 
-- Import the standard `MATERIAL` catalog with `StandardUnit` and benchmark `UnitPrice`.
+- Import the standard `MATERIAL` catalog with `Unit` and benchmark `StandardPrice`.
 - Register `EMPLOYEE` records with `JobTitle`, assigned `DEPARTMENT`, and verified `Certifications`.
 - Initialize `PROJECT` contracts, `PROJECT_SITE` coordinates, and `PROJECT_PHASE` milestone schedules.
-- Register owned or rented `EQUIPMENT` assets with unique `SerialNumber` values.
+- Register heavy `EQUIPMENT` assets with unique `SerialNumber`, `Category`, `Capacity`, and `HourlyRate` values.
 
 ## 5.2 Updates
 
-- Log worker `HoursLogged` and `RoleOnTask` on assigned `TASK` records.
+- Log worker `HoursLogged` and `RoleDescription` on assigned `TASK` records.
 - Record `DELIVERY_DISPATCH` arrivals against `PURCHASE_ORDER` items and increment `SITE_INVENTORY.CurrentStockQuantity`.
 - Record `MATERIAL_USAGE` quantities during task execution and deduct from on-site `CurrentStockQuantity`.
-- Accumulate `EQUIPMENT_DEPLOYMENT.HoursOperated`, update `TotalRunHours`, and transition `CurrentStatus` to `Under-Maintenance` when service intervals arrive.
-- Transition `PROJECT_PHASE.PhaseStatus` to `Accepted` after milestone sign-off.
+- Accumulate `EQUIPMENT_DEPLOYMENT.OperatingHours`, update `TotalRunHours`, and transition `EQUIPMENT.Status` to `Under-Maintenance` when service intervals arrive.
+- Transition `PROJECT_PHASE.Status` to `Completed` and update `ProgressPercentage` after milestone sign-off.
 - Record `SAFETY_INSPECTION` scores, remediation deadlines, and `INCIDENT_REPORT` cases.
 
 ## 5.3 Queries
 
 - Retrieve `Available` equipment by `Category` with no scheduled `EQUIPMENT_DEPLOYMENT` overlap in the next two weeks.
-- Identify `SITE_INVENTORY` items at a site where `CurrentStockQuantity` has fallen below `MATERIAL.MinStock` or `SafetyReorderQuantity`.
-- List `Urgent` tasks whose `TaskStatus` is not `Completed` past `ScheduledEndDate`.
+- Identify `SITE_INVENTORY` items at a site where `CurrentStockQuantity` has fallen below `MinStock` or `ReorderQuantity`.
+- List tasks whose `Status` is not `Completed` past `EndDate`.
 - Traverse the recursive `SUPERVISES` chain from any `EMPLOYEE` up to the general director.
-- Retrieve active subcontractors on a project with `ContractValue`, `SafetyRatingScore`, and retained `WarrantyHoldRate` amounts.
+- Retrieve active subcontractors on a project with `ContractValue` and retained `WarrantyHoldRate` amounts.
 
 ## 5.4 Reports
 
-- Cost vs. budget variance: Compares `PROJECT.EstimatedBudget` against aggregated spending across labor, equipment deployments, material purchases, and subcontracts (`ActualCost`).
+- Cost vs. budget variance: Compares `PROJECT.EstimatedBudget` against aggregated spending across labor, equipment deployments, material consumption, and subcontracts (`ActualCost`).
 - Earned value analysis: Computes Planned Value (PV), Earned Value (EV), Actual Cost (AC), Cost Performance Index (CPI), and Schedule Performance Index (SPI).
 - Site safety report: Summarizes `SAFETY_INSPECTION.OverallScore`, unresolved violations, `INCIDENT_REPORT.LostDays`, and injury-free hours per site.
-- Subcontractor scorecard: Ranks subcontractors by schedule adherence, inspection quality, and `SafetyRatingScore`.
-- Fleet utilization report: Compares `TotalRunHours` and `HoursOperated` against idle time and `HourlyRate` cost recovery.
+- Subcontractor scorecard: Ranks subcontractors by schedule adherence, contract scope delivery, and site inspection outcomes.
+- Fleet utilization report: Compares `TotalRunHours` and `OperatingHours` against maintenance cost and `HourlyRate` revenue generation.
 
 # 6. Entity-Relationship Diagram
 
@@ -550,19 +538,19 @@ Each of the six color-coded ERD domains groups related entity sets, relationship
    - Attribute classifications: `EMPLOYEE.Name` (`FirstName`, `MiddleName`, `LastName`) and `EMPLOYEE.Address` (`Street`, `Ward`, `District`, `City`) are composite; `Age` is derived; `Email` is a candidate key; `PhoneNumber` and `Certifications` are multi-valued.
 2. Projects (green)
    - Entity sets: Strong entities `CLIENT` (key: `ClientID`), `PROJECT` (key: `ProjectID`), `PROJECT_SITE` (key: `SiteID`), and `TASK` (key: `TaskID`), plus weak entity `PROJECT_PHASE` (identifying owner: `PROJECT`; partial key: `PhaseNumber`).
-   - Relationships: `COMMISSIONS` (1:N, partial `CLIENT`, total `PROJECT`), `DEPARTMENT_SPONSORS_PROJECT` (1:N, partial `DEPARTMENT`, total `PROJECT`), `DIRECTS_PROJECT` (1:1, partial `EMPLOYEE`, total `PROJECT`), `HAS_SITES` (1:N, total on both), `CONSISTS_OF_PHASES` (identifying 1:N, total on both), `CONTAINS_TASKS` (1:N, total on both), `PRECEDES` (recursive M:N on `TASK`, partial on both), and `WORKS_ON_TASK` (M:N, partial `EMPLOYEE`, total `TASK`, with `AssignedDate`, `RoleOnTask`, `HoursLogged`).
-   - Attribute classifications: `CLIENT.TaxCode` is a candidate key and `ContactPhone` is multi-valued; `PROJECT_SITE` has composite `LocationCoordinates` (`Latitude`, `Longitude`) and composite `Address` (`StreetAddress`, `District`, `City_Province`); `PROJECT.ProjectDuration`, `PROJECT.ActualCost`, and `TASK.ActualHours` are derived.
+   - Relationships: `COMMISSIONS` (1:N, partial `CLIENT`, total `PROJECT`), `DEPARTMENT_SPONSORS_PROJECT` (1:N, partial `DEPARTMENT`, total `PROJECT`), `DIRECTS_PROJECT` (1:1, partial `EMPLOYEE`, total `PROJECT`), `HAS_SITES` (1:N, total on both), `CONSISTS_OF_PHASES` (identifying 1:N, total on both), `CONTAINS_TASKS` (1:N, total on both), `PRECEDES` (recursive M:N on `TASK`, partial on both), and `WORKS_ON_TASK` (M:N, partial `EMPLOYEE`, total `TASK`, with `AssignedDate`, `RoleDescription`, `HoursLogged`).
+   - Attribute classifications: `CLIENT.TaxCode` and `CLIENT.Email` are candidate keys, `CLIENT.Address` (`Street`, `Ward`, `District`, `City`) is composite, and `ContactPhone` is multi-valued; `PROJECT.ProjectName` and `PROJECT.ContractNumber` are candidate keys; `PROJECT_SITE` has composite `LocationCoordinates` (`Latitude`, `Longitude`) and composite `Address` (`Street`, `Ward`, `District`, `City`); `PROJECT.ProjectDuration`, `PROJECT.ActualCost`, and `TASK.ActualCost` are derived.
 3. Equipment (orange)
    - Entity sets: Strong entity `EQUIPMENT` (key: `EquipmentID`) and weak entity `MAINTENANCE_RECORD` (identifying owner: `EQUIPMENT`; partial key: `RecordNumber`).
-   - Relationships: `HAS_MAINTENANCE` (identifying 1:N, partial `EQUIPMENT`, total `MAINTENANCE_RECORD`), `EQUIPMENT_DEPLOYMENT` (M:N between `EQUIPMENT` and `PROJECT_SITE`, partial on both, with `DeploymentStartDate`, `DeploymentEndDate`, `HoursOperated`), and `OPERATES` (1:N between `EMPLOYEE` and the `EQUIPMENT_DEPLOYMENT` aggregation, partial on both).
+   - Relationships: `HAS_MAINTENANCE` (identifying 1:N, partial `EQUIPMENT`, total `MAINTENANCE_RECORD`), `EQUIPMENT_DEPLOYMENT` (M:N between `EQUIPMENT` and `PROJECT_SITE`, partial on both, with `DeploymentStartDate`, `DeploymentEndDate`, `OperatingHours`), and `OPERATES` (1:N between `EMPLOYEE` and the `EQUIPMENT_DEPLOYMENT` aggregation, partial `EMPLOYEE`, total `EQUIPMENT_DEPLOYMENT`).
    - Attribute classifications: `EQUIPMENT.SerialNumber` is a candidate key; `TotalRunHours` is derived; `EQUIPMENT_DEPLOYMENT` acts as an aggregation so operator assignment attaches directly via `OPERATES`.
 4. Materials and procurement (purple)
    - Entity sets: Strong entities `SUPPLIER` (key: `SupplierID`), `PURCHASE_ORDER` (key: `PO_ID`), and `MATERIAL` (key: `MaterialID`), plus weak entity `PO_ITEM` (identifying owner: `PURCHASE_ORDER`; partial key: `LineNumber`).
-   - Relationships: `ISSUES_PO` (`PROJECT` 1:N `PURCHASE_ORDER`, partial `PROJECT`, total `PURCHASE_ORDER`), `SUPPLIES_PO` (`SUPPLIER` 1:N `PURCHASE_ORDER`, partial `SUPPLIER`, total `PURCHASE_ORDER`), `CONTAINS_ITEM` (identifying 1:N, total on both), `ITEM_REFERENCES_MATERIAL` (`PO_ITEM` N:1 `MATERIAL`, total `PO_ITEM`, partial `MATERIAL`), `SITE_INVENTORY` (`PROJECT_SITE` M:N `MATERIAL`, partial on both, with `CurrentStockQuantity`, `SafetyReorderQuantity`, `LastStocktakeDate`), ternary `DELIVERY_DISPATCH` (`SUPPLIER` x `MATERIAL` x `PROJECT_SITE`, all partial, with `DeliveryCode`, `DeliveryDate`, `DeliveredQuantity`), `FULFILLS_PO` (`PURCHASE_ORDER` 1:N over `DELIVERY_DISPATCH` aggregation, partial `PURCHASE_ORDER`, total `DELIVERY_DISPATCH`), `RECEIVES_DELIVERY` (`EMPLOYEE` 1:N over `DELIVERY_DISPATCH` aggregation, partial `EMPLOYEE`, total `DELIVERY_DISPATCH`), and ternary `MATERIAL_USAGE` (`TASK` x `MATERIAL` x `PROJECT_SITE`, all partial, with `UsageDate`, `QuantityUsed`).
-   - Attribute classifications: `SUPPLIER.TaxCode` is a candidate key, while `ContactPhone` and `SupplyCategories` are multi-valued; `PO_ITEM.ItemSubtotal` and `PURCHASE_ORDER.TotalPOAmount` are derived; `DELIVERY_DISPATCH` is wrapped as an aggregation to attach purchase-order fulfillment and receiving verification.
+   - Relationships: `ISSUES_PO` (`PROJECT` 1:N `PURCHASE_ORDER`, partial `PROJECT`, total `PURCHASE_ORDER`), `SUPPLIES_PO` (`SUPPLIER` 1:N `PURCHASE_ORDER`, partial `SUPPLIER`, total `PURCHASE_ORDER`), `CONTAINS_ITEM` (identifying 1:N, total on both), `ITEM_REFERENCES_MATERIAL` (`PO_ITEM` N:1 `MATERIAL`, total `PO_ITEM`, partial `MATERIAL`), `SITE_INVENTORY` (`PROJECT_SITE` M:N `MATERIAL`, partial on both, with `CurrentStockQuantity`, `MinStock`, `ReorderQuantity`), ternary `DELIVERY_DISPATCH` (`SUPPLIER` x `MATERIAL` x `PROJECT_SITE`, all partial, with `DeliveryCode`, `DeliveryDate`, `DeliveredQuantity`, `Status`), `FULFILLS_PO` (`PURCHASE_ORDER` 1:N over `DELIVERY_DISPATCH` aggregation, partial `PURCHASE_ORDER`, total `DELIVERY_DISPATCH`), `RECEIVES_DELIVERY` (`EMPLOYEE` 1:N over `DELIVERY_DISPATCH` aggregation, partial `EMPLOYEE`, total `DELIVERY_DISPATCH`), and ternary `MATERIAL_USAGE` (`TASK` x `MATERIAL` x `PROJECT_SITE`, all partial, with `UsageDate`, `UsedQuantity`).
+   - Attribute classifications: `SUPPLIER.TaxCode` and `SUPPLIER.Email` are candidate keys, `SUPPLIER.Address` (`Street`, `Ward`, `District`, `City`) is composite, while `ContactPhone` and `SupplyCategories` are multi-valued; `MATERIAL.MaterialName` is a candidate key; `PO_ITEM.ItemSubtotal` and `PURCHASE_ORDER.TotalAmount` are derived; `DELIVERY_DISPATCH` is wrapped as an aggregation to attach purchase-order fulfillment and receiving verification.
 5. Subcontractors (yellow)
    - Entity sets: Strong entity `SUBCONTRACTOR` (key: `SubcontractorID`), connected across domains to `PROJECT`.
-   - Relationships: `ENGAGES_SUBCONTRACTOR` (M:N between `PROJECT` and `SUBCONTRACTOR`, partial on both, carrying `ContractAgreementNo`, `ScopeDescription`, `ContractValue`, `WarrantyHoldRate`, `StartDate`, and `CompletionDate`).
+   - Relationships: `ENGAGES_SUBCONTRACTOR` (M:N between `PROJECT` and `SUBCONTRACTOR`, partial on both, carrying `ContractAgreementNo`, `ScopeOfWork`, `ContractValue`, `WarrantyHoldRate`, `StartDate`, and `EndDate`).
    - Attribute classifications: `SUBCONTRACTOR.TaxCode` and `SUBCONTRACTOR.LicenseNumber` are candidate keys; `ContractAgreementNo` uniquely identifies each engagement contract across projects.
 6. Safety (red)
    - Entity sets: Strong entities `SAFETY_INSPECTION` (key: `InspectionID`) and `INCIDENT_REPORT` (key: `IncidentID`).
@@ -573,11 +561,11 @@ Each of the six color-coded ERD domains groups related entity sets, relationship
 
 ## 7.1 Mapping rules and diagram
 
-![Relational Schema of the A34Build database](./schema/schema-v2.png "Relational schema of the A34Build construction company database, color-coded by domain")
+![Relational Schema of the A34Build database](./schema/schema.png "Relational schema of the A34Build construction company database, color-coded by domain")
 
 *Figure 2: Relational schema of the A34Build database across 29 tables and 44 foreign-key references.*
 
-Converting the Chen ERD yields 29 relation schemas under standard relational mapping rules: composite attributes (`Name`, `Address`, `LocationCoordinates`) expand into atomic scalar columns, multi-valued attributes (`ContactPhone`, `PhoneNumber`, `Certifications`, `SupplyCategories`) map to dedicated child tables keyed by owner key plus attribute value, and derived attributes (`Age`, `ProjectDuration`, `ActualCost`, `ActualHours`, `TotalRunHours`, `ItemSubtotal`, `TotalPOAmount`) are excluded from stored columns. Weak entities inherit their identifying owner's primary key combined with their partial key, while 1:1, 1:N, M:N, ternary, and aggregation relationships map via foreign keys or associative tables. In Figure 2, underlined columns form the primary key, dashed-underlined columns mark weak-entity partial keys, and arrows point from each foreign key to its referenced primary key.
+Converting the Chen ERD yields 29 relation schemas under standard relational mapping rules: composite attributes (`Name`, `Address`, `LocationCoordinates`) expand into atomic scalar columns, multi-valued attributes (`ContactPhone`, `PhoneNumber`, `Certifications`, `SupplyCategories`) map to dedicated child tables keyed by owner key plus attribute value, and purely derived attributes (`Age`, `ProjectDuration`, `ItemSubtotal`) are excluded from stored columns, while materialized ledger totals (`PROJECT.ActualCost`, `TASK.ActualCost`, `EQUIPMENT.TotalRunHours`, `PURCHASE_ORDER.TotalAmount`) are retained as cached numeric columns for reporting. Weak entities inherit their identifying owner's primary key combined with their partial key, while 1:1, 1:N, M:N, ternary, and aggregation relationships map via foreign keys or associative tables. In Figure 2, underlined columns form the primary key, dashed-underlined columns mark weak-entity partial keys, and arrows point from each foreign key to its referenced primary key.
 
 ## 7.2 Schema definitions by domain
 
@@ -591,48 +579,48 @@ Converting the Chen ERD yields 29 relation schemas under standard relational map
 | EMPLOYEE | `EmpID` | `EmpID`, `FirstName`, `MiddleName`, `LastName`, `Street`, `Ward`, `District`, `City`, `DOB`, `HireDate`, `Salary`, `JobTitle`, `Email`, `DeptID`, `SupervisorID` | `DeptID -> DEPARTMENT(DeptID)`; `SupervisorID -> EMPLOYEE(EmpID)` |
 | EMPLOYEE_PHONE | `EmpID`, `PhoneNumber` | `EmpID`, `PhoneNumber` | `EmpID -> EMPLOYEE(EmpID)` |
 | EMPLOYEE_CERTIFICATION | `EmpID`, `Certification` | `EmpID`, `Certification` | `EmpID -> EMPLOYEE(EmpID)` |
-| DEPENDENT | `EmpID`, `DependentName` (partial key) | `EmpID`, `DependentName`, `Gender`, `BirthDate`, `Relationship`, `ContactPhone`, `IsEmergencyContact` | `EmpID -> EMPLOYEE(EmpID)` |
+| DEPENDENT | `EmpID`, `DependentName` (partial key) | `EmpID`, `DependentName`, `Relationship`, `Gender`, `DOB`, `IsEmergencyContact` | `EmpID -> EMPLOYEE(EmpID)` |
 
 ### 7.2.2 Projects
 
-`CLIENT.ContactPhone` extracts into `CLIENT_PHONE`, `PROJECT_SITE` expands composite `LocationCoordinates` and `Address` into atomic columns, derived attributes (`ProjectDuration`, `ActualCost`, `ActualHours`) are omitted, and `TASK` references `PROJECT_PHASE` through the composite foreign key `(ProjectID, PhaseNumber)`.
+`CLIENT.ContactPhone` extracts into `CLIENT_PHONE`, `CLIENT` and `PROJECT_SITE` expand composite `Address` and `LocationCoordinates` into atomic columns, `ProjectDuration` is omitted as derived while `PROJECT.ActualCost` and `TASK.ActualCost` are retained as materialized totals, and `TASK` references `PROJECT_PHASE` through the composite foreign key `(ProjectID, PhaseNumber)`.
 
 | Table | Primary Key | Attributes | Foreign Keys |
 | :--- | :--- | :--- | :--- |
-| CLIENT | `ClientID` | `ClientID`, `ClientName`, `ClientType`, `ContactPerson`, `ContactEmail`, `TaxCode` | *None* |
+| CLIENT | `ClientID` | `ClientID`, `ClientName`, `TaxCode`, `RepresentativeName`, `Email`, `Street`, `Ward`, `District`, `City` | *None* |
 | CLIENT_PHONE | `ClientID`, `ContactPhone` | `ClientID`, `ContactPhone` | `ClientID -> CLIENT(ClientID)` |
-| PROJECT | `ProjectID` | `ProjectID`, `ProjectName`, `StartDate`, `PlannedEndDate`, `ActualEndDate`, `EstimatedBudget`, `Status`, `ClientID`, `DeptID`, `DirectorEmpID` | `ClientID -> CLIENT(ClientID)`; `DeptID -> DEPARTMENT(DeptID)`; `DirectorEmpID -> EMPLOYEE(EmpID)` |
-| PROJECT_SITE | `SiteID` | `SiteID`, `ProjectID`, `SiteName`, `Latitude`, `Longitude`, `StreetAddress`, `District`, `City_Province`, `EnvironmentalPermit`, `SiteStatus` | `ProjectID -> PROJECT(ProjectID)` |
-| PROJECT_PHASE | `ProjectID`, `PhaseNumber` (partial key) | `ProjectID`, `PhaseNumber`, `PhaseTitle`, `StartDate`, `TargetCompletionDate`, `PhaseBudget`, `PhaseStatus` | `ProjectID -> PROJECT(ProjectID)` |
-| TASK | `TaskID` | `TaskID`, `TaskName`, `EstimatedHours`, `ScheduledStartDate`, `ScheduledEndDate`, `ActualEndDate`, `PriorityLevel`, `TaskStatus`, `ProjectID`, `PhaseNumber` | `(ProjectID, PhaseNumber) -> PROJECT_PHASE(ProjectID, PhaseNumber)` |
+| PROJECT | `ProjectID` | `ProjectID`, `ProjectName`, `ContractNumber`, `EstimatedBudget`, `ActualCost`, `StartDate`, `ScheduledEndDate`, `ActualEndDate`, `Status`, `ClientID`, `DeptID`, `DirectorEmpID` | `ClientID -> CLIENT(ClientID)`; `DeptID -> DEPARTMENT(DeptID)`; `DirectorEmpID -> EMPLOYEE(EmpID)` |
+| PROJECT_SITE | `SiteID` | `SiteID`, `SiteName`, `Street`, `Ward`, `District`, `City`, `Latitude`, `Longitude`, `ProjectID` | `ProjectID -> PROJECT(ProjectID)` |
+| PROJECT_PHASE | `ProjectID`, `PhaseNumber` (partial key) | `ProjectID`, `PhaseNumber`, `PhaseName`, `PhaseBudget`, `StartDate`, `ScheduledEndDate`, `ActualEndDate`, `Status`, `ProgressPercentage` | `ProjectID -> PROJECT(ProjectID)` |
+| TASK | `TaskID` | `TaskID`, `TaskName`, `Description`, `EstimatedCost`, `ActualCost`, `StartDate`, `EndDate`, `Status`, `ProjectID`, `PhaseNumber` | `(ProjectID, PhaseNumber) -> PROJECT_PHASE(ProjectID, PhaseNumber)` |
 | PRECEDES | `PredecessorTaskID`, `SuccessorTaskID` | `PredecessorTaskID`, `SuccessorTaskID` | `PredecessorTaskID -> TASK(TaskID)`; `SuccessorTaskID -> TASK(TaskID)` |
-| WORKS_ON_TASK | `EmpID`, `TaskID` | `EmpID`, `TaskID`, `AssignedDate`, `RoleOnTask`, `HoursLogged` | `EmpID -> EMPLOYEE(EmpID)`; `TaskID -> TASK(TaskID)` |
+| WORKS_ON_TASK | `EmpID`, `TaskID` | `EmpID`, `TaskID`, `HoursLogged`, `RoleDescription`, `AssignedDate` | `EmpID -> EMPLOYEE(EmpID)`; `TaskID -> TASK(TaskID)` |
 
 ### 7.2.3 Equipment
 
-`EQUIPMENT` omits derived `TotalRunHours`, `MAINTENANCE_RECORD` inherits `EquipmentID` with partial key `RecordNumber`, and `EQUIPMENT_DEPLOYMENT` adds `OperatorEmpID` from the `OPERATES` aggregation relationship.
+`EQUIPMENT` retains `TotalRunHours` as a materialized meter total, `MAINTENANCE_RECORD` inherits `EquipmentID` with partial key `RecordNumber`, and `EQUIPMENT_DEPLOYMENT` adds `OperatorEmpID` from the `OPERATES` aggregation relationship.
 
 | Table | Primary Key | Attributes | Foreign Keys |
 | :--- | :--- | :--- | :--- |
-| EQUIPMENT | `EquipmentID` | `EquipmentID`, `Model`, `SerialNumber`, `Category`, `Ownership`, `HourlyRate`, `CurrentStatus` | *None* |
-| MAINTENANCE_RECORD | `EquipmentID`, `RecordNumber` (partial key) | `EquipmentID`, `RecordNumber`, `ServiceDate`, `MaintenanceType`, `Cost`, `ServiceVendor` | `EquipmentID -> EQUIPMENT(EquipmentID)` |
-| EQUIPMENT_DEPLOYMENT | `EquipmentID`, `SiteID`, `DeploymentStartDate` | `EquipmentID`, `SiteID`, `DeploymentStartDate`, `DeploymentEndDate`, `HoursOperated`, `OperatorEmpID` | `EquipmentID -> EQUIPMENT(EquipmentID)`; `SiteID -> PROJECT_SITE(SiteID)`; `OperatorEmpID -> EMPLOYEE(EmpID)` |
+| EQUIPMENT | `EquipmentID` | `EquipmentID`, `SerialNumber`, `EquipmentName`, `Category`, `Capacity`, `HourlyRate`, `Status`, `TotalRunHours` | *None* |
+| MAINTENANCE_RECORD | `EquipmentID`, `RecordNumber` (partial key) | `EquipmentID`, `RecordNumber`, `MaintenanceDate`, `MaintenanceType`, `Description`, `Cost`, `PerformedBy` | `EquipmentID -> EQUIPMENT(EquipmentID)` |
+| EQUIPMENT_DEPLOYMENT | `EquipmentID`, `SiteID`, `DeploymentStartDate` | `EquipmentID`, `SiteID`, `DeploymentStartDate`, `DeploymentEndDate`, `OperatingHours`, `OperatorEmpID` | `EquipmentID -> EQUIPMENT(EquipmentID)`; `SiteID -> PROJECT_SITE(SiteID)`; `OperatorEmpID -> EMPLOYEE(EmpID)` |
 
 ### 7.2.4 Materials and procurement
 
-`SUPPLIER_PHONE` and `SUPPLIER_CATEGORY` extract multi-valued supplier attributes, derived `TotalPOAmount` and `ItemSubtotal` are omitted, `DELIVERY_DISPATCH` adds `PO_ID` (`FULFILLS_PO`) and `ReceivedByEmpID` (`RECEIVES_DELIVERY`) from aggregation links, and `MATERIAL_USAGE` maps the ternary consumption relationship.
+`SUPPLIER` expands composite `Address`, `SUPPLIER_PHONE` and `SUPPLIER_CATEGORY` extract multi-valued supplier attributes, `ItemSubtotal` is omitted as derived while `PURCHASE_ORDER.TotalAmount` is materialized, `DELIVERY_DISPATCH` adds `PO_ID` (`FULFILLS_PO`) and `ReceivedByEmpID` (`RECEIVES_DELIVERY`) from aggregation links alongside `SupplierID` from the ternary mapping, and `MATERIAL_USAGE` maps the ternary consumption relationship.
 
 | Table | Primary Key | Attributes | Foreign Keys |
 | :--- | :--- | :--- | :--- |
-| SUPPLIER | `SupplierID` | `SupplierID`, `CompanyName`, `TaxCode`, `ContactEmail`, `CreditRating` | *None* |
+| SUPPLIER | `SupplierID` | `SupplierID`, `SupplierName`, `TaxCode`, `Email`, `Street`, `Ward`, `District`, `City` | *None* |
 | SUPPLIER_PHONE | `SupplierID`, `ContactPhone` | `SupplierID`, `ContactPhone` | `SupplierID -> SUPPLIER(SupplierID)` |
 | SUPPLIER_CATEGORY | `SupplierID`, `SupplyCategory` | `SupplierID`, `SupplyCategory` | `SupplierID -> SUPPLIER(SupplierID)` |
-| MATERIAL | `MaterialID` | `MaterialID`, `MaterialName`, `Category`, `StandardUnit`, `UnitPrice`, `MinStock` | *None* |
-| PURCHASE_ORDER | `PO_ID` | `PO_ID`, `OrderDate`, `ExpectedDeliveryDate`, `DeliveryStatus`, `ProjectID`, `SupplierID` | `ProjectID -> PROJECT(ProjectID)`; `SupplierID -> SUPPLIER(SupplierID)` |
-| PO_ITEM | `PO_ID`, `LineNumber` (partial key) | `PO_ID`, `LineNumber`, `QuantityOrdered`, `AgreedUnitPrice`, `MaterialID` | `PO_ID -> PURCHASE_ORDER(PO_ID)`; `MaterialID -> MATERIAL(MaterialID)` |
-| SITE_INVENTORY | `SiteID`, `MaterialID` | `SiteID`, `MaterialID`, `CurrentStockQuantity`, `SafetyReorderQuantity`, `LastStocktakeDate` | `SiteID -> PROJECT_SITE(SiteID)`; `MaterialID -> MATERIAL(MaterialID)` |
-| DELIVERY_DISPATCH | `DeliveryCode` | `DeliveryCode`, `SupplierID`, `MaterialID`, `SiteID`, `DeliveryDate`, `DeliveredQuantity`, `ReceivedByEmpID`, `PO_ID` | `SupplierID -> SUPPLIER(SupplierID)`; `MaterialID -> MATERIAL(MaterialID)`; `SiteID -> PROJECT_SITE(SiteID)`; `ReceivedByEmpID -> EMPLOYEE(EmpID)`; `PO_ID -> PURCHASE_ORDER(PO_ID)` |
-| MATERIAL_USAGE | `TaskID`, `MaterialID`, `SiteID`, `UsageDate` | `TaskID`, `MaterialID`, `SiteID`, `UsageDate`, `QuantityUsed` | `TaskID -> TASK(TaskID)`; `MaterialID -> MATERIAL(MaterialID)`; `SiteID -> PROJECT_SITE(SiteID)` |
+| MATERIAL | `MaterialID` | `MaterialID`, `MaterialName`, `Unit`, `StandardPrice` | *None* |
+| PURCHASE_ORDER | `PO_ID` | `PO_ID`, `OrderDate`, `TotalAmount`, `Status`, `ProjectID`, `SupplierID` | `ProjectID -> PROJECT(ProjectID)`; `SupplierID -> SUPPLIER(SupplierID)` |
+| PO_ITEM | `PO_ID`, `LineNumber` (partial key) | `PO_ID`, `LineNumber`, `OrderQuantity`, `UnitPrice`, `MaterialID` | `PO_ID -> PURCHASE_ORDER(PO_ID)`; `MaterialID -> MATERIAL(MaterialID)` |
+| SITE_INVENTORY | `SiteID`, `MaterialID` | `SiteID`, `MaterialID`, `CurrentStockQuantity`, `MinStock`, `ReorderQuantity` | `SiteID -> PROJECT_SITE(SiteID)`; `MaterialID -> MATERIAL(MaterialID)` |
+| DELIVERY_DISPATCH | `DeliveryCode` | `DeliveryCode`, `DeliveryDate`, `DeliveredQuantity`, `Status`, `MaterialID`, `SiteID`, `ReceivedByEmpID`, `PO_ID`, `SupplierID` | `SupplierID -> SUPPLIER(SupplierID)`; `MaterialID -> MATERIAL(MaterialID)`; `SiteID -> PROJECT_SITE(SiteID)`; `ReceivedByEmpID -> EMPLOYEE(EmpID)`; `PO_ID -> PURCHASE_ORDER(PO_ID)` |
+| MATERIAL_USAGE | `TaskID`, `MaterialID`, `SiteID`, `UsageDate` | `TaskID`, `MaterialID`, `SiteID`, `UsageDate`, `UsedQuantity` | `TaskID -> TASK(TaskID)`; `MaterialID -> MATERIAL(MaterialID)`; `SiteID -> PROJECT_SITE(SiteID)` |
 
 ### 7.2.5 Subcontractors
 
@@ -640,8 +628,8 @@ Converting the Chen ERD yields 29 relation schemas under standard relational map
 
 | Table | Primary Key | Attributes | Foreign Keys |
 | :--- | :--- | :--- | :--- |
-| SUBCONTRACTOR | `SubcontractorID` | `SubcontractorID`, `CompanyName`, `TaxCode`, `ContactEmail`, `ContactPhone`, `TradeSpecialty`, `LicenseNumber`, `SafetyRatingScore` | *None* |
-| SUBCONTRACT | `ContractAgreementNo` | `ContractAgreementNo`, `ProjectID`, `SubcontractorID`, `ScopeDescription`, `ContractValue`, `WarrantyHoldRate`, `StartDate`, `CompletionDate` | `ProjectID -> PROJECT(ProjectID)`; `SubcontractorID -> SUBCONTRACTOR(SubcontractorID)` |
+| SUBCONTRACTOR | `SubcontractorID` | `SubcontractorID`, `SubcontractorName`, `TaxCode`, `Specialization`, `ContactPerson`, `ContactPhone`, `ContactEmail`, `LicenseNumber` | *None* |
+| SUBCONTRACT | `ContractAgreementNo` | `ContractAgreementNo`, `ProjectID`, `SubcontractorID`, `ScopeOfWork`, `ContractValue`, `WarrantyHoldRate`, `StartDate`, `EndDate` | `ProjectID -> PROJECT(ProjectID)`; `SubcontractorID -> SUBCONTRACTOR(SubcontractorID)` |
 
 ### 7.2.6 Safety
 
